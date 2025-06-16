@@ -1,0 +1,22 @@
+{
+  "caso": "045-C",
+  "agente": "Chiwasky, Mateusz",
+  "ente": "Federal Bureau of Investigation (FBI)",
+  "data": "16/06/1954",
+  "ora": "21:34",
+  "luogo": "Edificio abbandonato, periferia di Lansing",
+  "classificazione": "RISERVATO",
+  "descrizione": "Alle ore 21:34 sono giunto sul luogo indicato nella segnalazione del distretto locale riguardante possibili attività di traffico illecito di sostanze controllate. L’edificio in questione, un capannone abbandonato ai margini di una zona industriale dismessa, mostrava segni di attività recente: impronte di scarpe fresche sul terreno polveroso e alcuni residui di polveri bianche su un tavolo di legno nella stanza principale. Durante l’ispezione, non sono state riscontrate persone presenti né movimenti sospetti nell’area circostante. Tuttavia, la stanza presentava un forte odore pungente di solventi chimici, tipico di sostanze stupefacenti in fase di lavorazione. Sono stati recuperati campioni di polveri e liquidi per analisi di laboratorio, oltre a strumenti rudimentali per la produzione e confezionamento. Non sono state rilevate armi o esplosivi, né dispositivi elettronici complessi, coerentemente con un’attività clandestina di modeste dimensioni, ma ben organizzata. Il registratore portatile ha documentato rumori ambientali di macchinari in stand-by, e nel corso della raccolta prove ho osservato un viavai intermittente nelle ore precedenti, come confermato da testimoni locali.",
+  "allegati": [
+    "Fotografie in bianco e nero (formato 35 mm) della scena e dei materiali rinvenuti",
+    "Campioni sigillati di sostanze sospette inviati al laboratorio federale",
+    "Registrazioni audio ambientali su nastro magnetico",
+    "Relazioni testimoni oculari raccolte sul posto"
+  ],
+  "conclusione": "L’attività investigativa preliminare conferma l’esistenza di un piccolo centro di produzione e distribuzione di sostanze illecite. Si raccomanda il proseguimento dell’indagine con appostamenti e intercettazioni, oltre al coinvolgimento della polizia locale per controlli e arresti mirati.",
+  "firma": {
+    "nome": "M. Chiwasky",
+    "ruolo": "Agente speciale – Federal Bureau of Investigation (FBI)",
+    "divisione": "Divisione Narcotici – Distretto Centrale"
+  }
+}
