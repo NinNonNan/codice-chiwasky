@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
-/* Corpo pagina */
 body {
   background: #f7f3e9;
   color: #111;
@@ -14,7 +13,6 @@ body {
   box-shadow: 0 0 12px rgba(0,0,0,0.1);
 }
 
-/* Titoli principali */
 h1, h2 {
   text-transform: uppercase;
   margin-bottom: 0;
@@ -24,7 +22,6 @@ h1, h2 {
   letter-spacing: 0.05em;
 }
 
-/* Meta informazioni sotto il titolo */
 .meta {
   margin: 1.5rem 0;
   font-size: 0.95rem;
@@ -35,7 +32,6 @@ h1, h2 {
   margin-bottom: 0.5rem;
 }
 
-/* Timbro "RISERVATO" */
 .stamp {
   font-size: 1.5rem;
   font-weight: bold;
@@ -51,7 +47,6 @@ h1, h2 {
   box-shadow: 1px 1px 2px rgba(128,0,0,0.3);
 }
 
-/* Corpo testo rapporto */
 .content {
   white-space: pre-wrap;
   letter-spacing: 0.03em;
@@ -59,10 +54,9 @@ h1, h2 {
   margin-bottom: 2rem;
 }
 
-/* Titoli sezioni (Allegati, Conclusione, ecc.) */
 h3 {
   margin-top: 2.5rem;
-  margin-bottom: 0rem; /* Ridotto margine inferiore */
+  margin-bottom: 0 !important;
   padding-bottom: 0.1rem;
   font-weight: normal;
   letter-spacing: 0.05em;
@@ -70,19 +64,17 @@ h3 {
   border-bottom: 1px dotted #999;
 }
 
-/* Riduci spazio tra titolo h3 e lista ul o p subito dopo */
-h3 + ul,
-h3 + p {
+h3 + p,
+h3 + ul {
   margin-top: 0 !important;
+  padding-top: 0 !important;
 }
 
-/* Paragrafi generici */
 p {
   margin-top: 0.5rem;
   margin-bottom: 1rem;
 }
 
-/* Lista degli allegati */
 ul {
   padding-left: 1.5rem;
   line-height: 1.5;
@@ -90,7 +82,6 @@ ul {
   margin-bottom: 1rem;
 }
 
-/* Footer */
 footer {
   margin-top: 4rem;
   font-size: 0.9rem;
