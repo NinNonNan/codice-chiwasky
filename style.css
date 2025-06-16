@@ -61,7 +61,7 @@ h1, h2 {
 
 /* Titolo Allegati */
 h3 {
-  margin-bottom: 0.3rem; /* riduce lo spazio sotto il titolo */
+  margin-bottom: 0.1rem; /* ridotto spazio sotto il titolo */
   font-weight: normal;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -72,7 +72,7 @@ h3 {
 
 /* Lista degli allegati */
 ul {
-  margin-top: 0.3rem; /* riduce lo spazio sopra la lista */
+  margin-top: 0.1rem; /* ridotto spazio sopra la lista */
   padding-left: 1.5rem; /* indent classico per liste */
   line-height: 1.5;
 }
