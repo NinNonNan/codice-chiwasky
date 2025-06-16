@@ -2,26 +2,26 @@
 
 /* Corpo pagina */
 body {
-  background: #f7f3e9; /* colore carta ingiallita vintage */
-  color: #111; /* testo scuro, leggibile */
-  font-family: 'Special Elite', Courier, monospace; /* font stile macchina da scrivere */
+  background: #f7f3e9;
+  color: #111;
+  font-family: 'Special Elite', Courier, monospace;
   padding: 4rem 2rem;
   max-width: 800px;
   margin: auto;
-  line-height: 1.7; /* interlinea maggiore per migliore leggibilità */
+  line-height: 1.7;
   font-size: 1.1rem;
-  border: 1px solid #ccc; /* bordo chiaro, effetto documento cartaceo */
-  box-shadow: 0 0 12px rgba(0,0,0,0.1); /* leggera ombra per profondità */
+  border: 1px solid #ccc;
+  box-shadow: 0 0 12px rgba(0,0,0,0.1);
 }
 
 /* Titoli principali */
 h1, h2 {
-  text-transform: uppercase; /* tutto maiuscolo come nei rapporti ufficiali */
+  text-transform: uppercase;
   margin-bottom: 0;
-  border-bottom: 1px dashed #999; /* linea tratteggiata sotto il titolo */
+  border-bottom: 1px dashed #999;
   padding-bottom: 0.2rem;
   font-weight: normal;
-  letter-spacing: 0.05em; /* spaziatura leggermente aumentata per effetto macchina da scrivere */
+  letter-spacing: 0.05em;
 }
 
 /* Meta informazioni sotto il titolo */
@@ -35,7 +35,7 @@ h1, h2 {
   margin-bottom: 0.5rem;
 }
 
-/* Timbro "RISERVATO" inclinato */
+/* Timbro "RISERVATO" */
 .stamp {
   font-size: 1.5rem;
   font-weight: bold;
@@ -47,33 +47,33 @@ h1, h2 {
   margin-top: 1rem;
   margin-bottom: 2rem;
   font-family: 'Special Elite', Courier, monospace;
-  background-color: #fbeaea; /* sfondo leggermente rosato */
+  background-color: #fbeaea;
   box-shadow: 1px 1px 2px rgba(128,0,0,0.3);
 }
 
 /* Corpo testo rapporto */
 .content {
-  white-space: pre-wrap; /* mantiene ritorni a capo */
-  letter-spacing: 0.03em; /* effetto macchina da scrivere */
-  word-spacing: 0.1em; /* spaziatura tra parole leggermente aumentata */
+  white-space: pre-wrap;
+  letter-spacing: 0.03em;
+  word-spacing: 0.1em;
   margin-bottom: 2rem;
 }
 
-/* Titolo Allegati */
+/* Titoli sezioni (Allegati, Conclusione, ecc.) */
 h3 {
-  margin-bottom: 0;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem; /* spazio uniforme sotto tutti gli h3 */
   padding-bottom: 0.2rem;
   font-weight: normal;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   border-bottom: 1px dotted #999;
-  margin-top: 2rem;
 }
 
 /* Lista degli allegati */
 ul {
-  margin-top: 0.2rem; /* spazio identico a quello tra “Conclusione” e testo */
-  padding-left: 1.5rem; /* indent classico per liste */
+  margin-top: 0; /* lasciamo h3 gestire lo spazio */
+  padding-left: 1.5rem;
   line-height: 1.5;
 }
 
