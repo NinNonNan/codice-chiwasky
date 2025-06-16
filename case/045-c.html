@@ -39,42 +39,63 @@
   </footer>
 
   <script>
-    const fileName = location.pathname.split("/").pop().replace(".html", ".json");
-  
-    // ✅ DEBUG: Mostra quale file sta cercando di caricare
+    // Ottiene l'ultimo segmento del percorso URL (es: "045-c.html" o "045-c")
+    let fileName = location.pathname.split("/").pop();
+
+    // Controlla se fileName non termina con ".json"
+    if (!fileName.endsWith(".json")) {
+      // Se contiene ".html", sostituisce ".html" con ".json"
+      if (fileName.includes('.html')) {
+        fileName = fileName.replace(".html", ".json");
+      } else {
+        // Altrimenti aggiunge semplicemente ".json" (es. "045-c" -> "045-c.json")
+        fileName = fileName + ".json";
+      }
+    }
+
+    // Debug: stampa in console il nome del file JSON che verrà caricato
     console.log("📁 Caricamento JSON da:", fileName);
-  
+
     fetch(fileName)
       .then(res => {
         if (!res.ok) {
+          // Se la risposta non è OK, genera un errore con lo status HTTP
           throw new Error(`HTTP error! Status: ${res.status}`);
         }
+        // Converte la risposta in JSON
         return res.json();
       })
       .then(data => {
+        // Popola la pagina con i dati caricati dal JSON
+
+        // Imposta il titolo della pagina con il nome dell'agente
         document.title = `Rapporto | Agente ${data.agente}`;
+
+        // Inserisce i dati nei rispettivi elementi della pagina
         document.getElementById('caso-id').textContent = data.caso;
         document.getElementById('agente').textContent = `${data.agente} – ${data.ente}`;
         document.getElementById('data').textContent = data.data;
         document.getElementById('ora').textContent = data.ora;
         document.getElementById('luogo').textContent = data.luogo;
         document.getElementById('classificazione').textContent = data.classificazione;
-  
+
         document.getElementById('descrizione').textContent = data.descrizione;
-  
+
+        // Popola la lista degli allegati con elementi <li>
         const allegatiList = document.getElementById('allegati');
         data.allegati.forEach(item => {
           const li = document.createElement('li');
           li.textContent = item;
           allegatiList.appendChild(li);
         });
-  
+
         document.getElementById('conclusione').textContent = data.conclusione;
         document.getElementById('firma-nome').textContent = data.firma.nome;
         document.getElementById('firma-ruolo').textContent = data.firma.ruolo;
         document.getElementById('firma-divisione').textContent = data.firma.divisione;
       })
       .catch(err => {
+        // Se si verifica un errore nel caricamento del JSON, mostra un messaggio in pagina
         document.body.innerHTML = `<h2>❌ Errore nel caricamento del rapporto JSON.</h2><p>${err.message}</p>`;
         console.error("🛑 Errore caricamento JSON:", err);
       });
