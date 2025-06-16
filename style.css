@@ -62,7 +62,7 @@ h1, h2 {
 /* Titoli sezioni (Allegati, Conclusione, ecc.) */
 h3 {
   margin-top: 2.5rem;
-  margin-bottom: 0.1rem;   /* spazio molto ridotto sotto il titolo */
+  margin-bottom: 0rem; /* Ridotto margine inferiore */
   padding-bottom: 0.1rem;
   font-weight: normal;
   letter-spacing: 0.05em;
@@ -73,14 +73,21 @@ h3 {
 /* Riduci spazio tra titolo h3 e lista ul o p subito dopo */
 h3 + ul,
 h3 + p {
-  margin-top: 0;
+  margin-top: 0 !important;
+}
+
+/* Paragrafi generici */
+p {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 /* Lista degli allegati */
 ul {
   padding-left: 1.5rem;
   line-height: 1.5;
-  margin-top: 0.5rem; /* margine di default ridotto per le liste */
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 /* Footer */
