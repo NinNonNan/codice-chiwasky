@@ -1,53 +1,127 @@
+/* Import font "Special Elite", che richiama il carattere macchina da scrivere vintage */
 @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
 
 body {
+  /* Colore di sfondo caldo e un po’ ingiallito per effetto carta vecchia */
   background: #f7f3e9;
+  /* Testo nero/grigio scuro per buona leggibilità */
   color: #111;
+  /* Font vintage monospace + special elite (macchina da scrivere) */
   font-family: 'Special Elite', Courier, monospace;
+  /* Padding generoso per creare margini interni "aria" attorno al testo */
   padding: 4rem 2rem;
+  /* Limite di larghezza per lettura ottimale (simula dimensione foglio) */
   max-width: 800px;
+  /* Centrare il contenuto orizzontalmente */
   margin: auto;
+  /* Interlinea leggermente più spaziosa per migliore leggibilità */
   line-height: 1.6;
+  /* Dimensione testo leggibile ma non troppo grande */
   font-size: 1.1rem;
+  /* Bordo sottile chiaro per simulare margine pagina */
   border: 1px solid #ccc;
+  /* Ombra leggera e sfumata per effetto rilievo “vecchio documento” */
   box-shadow: 0 0 12px rgba(0,0,0,0.1);
+  /* Effetto leggero di texture sfumata usando filtro CSS */
+  filter: grayscale(0.05);
 }
 
 h1, h2 {
+  /* Maiuscole stile ufficiale e autoritario anni ’50 */
   text-transform: uppercase;
+  /* Nessun margine sotto per avvicinare titolo al bordo inferiore */
   margin-bottom: 0;
+  /* Linea tratteggiata sottile sotto per effetto divisione documento */
   border-bottom: 1px dashed #999;
+  /* Padding sotto linea per dare aria al testo */
   padding-bottom: 0.2rem;
+  /* Spaziatura verticale */
+  margin-top: 0;
+  margin-bottom: 1rem;
 }
 
 .meta {
+  /* Margine verticale per separare dai titoli e contenuto */
   margin: 1.5rem 0;
+  /* Testo leggermente più piccolo per metadati */
   font-size: 0.95rem;
+  /* Font leggermente più sottile per distinguersi dal corpo */
+  font-weight: 400;
+  /* Spaziatura tra righe */
+  line-height: 1.4;
 }
 
 .meta div {
+  /* Distanza tra le righe dei metadati */
   margin-bottom: 0.5rem;
 }
 
 .stamp {
+  /* Dimensione grande per evidenziare "RISERVATO" */
   font-size: 1.5rem;
   font-weight: bold;
+  /* Rosso scuro per senso di urgenza e riservatezza */
   color: darkred;
+  /* Leggera rotazione per effetto "timbro a mano" */
   transform: rotate(-5deg);
+  /* Bordo rosso scuro come contorno timbro */
   border: 2px solid darkred;
+  /* Inline block per padding e margini personalizzati */
   display: inline-block;
+  /* Padding orizzontale e verticale per "spessore" timbro */
   padding: 0.25rem 1rem;
+  /* Margini verticali per staccare dagli altri contenuti */
   margin-top: 1rem;
   margin-bottom: 2rem;
+  /* Sfumatura ombreggiata per effetto inchiostro irregolare */
+  text-shadow: 0 1px 0 #7a0000;
 }
 
 .content {
+  /* Mantiene gli spazi, i ritorni a capo come nel testo sorgente */
   white-space: pre-wrap;
+  /* Font leggermente più grande e linea spaziosa */
+  font-size: 1.1rem;
+  line-height: 1.6;
+  /* Spaziatura verticale */
+  margin-bottom: 2rem;
+}
+
+.content h3 {
+  /* Intestazioni paragrafo più piccole ma marcate */
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  font-size: 1.15rem;
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+  /* Bordo sottile solido per separare sezioni */
+  border-bottom: 1px solid #999;
+  padding-bottom: 0.3rem;
+}
+
+.content ul {
+  /* Spaziatura e indentazione classica elenco */
+  padding-left: 2rem;
+  margin-bottom: 2rem;
+  list-style-type: disc;
+}
+
+.content ul li {
+  /* Margine inferiore per distanziare i punti elenco */
+  margin-bottom: 0.5rem;
+  /* Testo leggermente più piccolo per punti elenco */
+  font-size: 1rem;
 }
 
 footer {
+  /* Spaziatura maggiore per separare dal contenuto */
   margin-top: 4rem;
+  /* Testo piccolo e grigio scuro per effetto "nota a piè di pagina" */
   font-size: 0.9rem;
   text-align: center;
   color: #555;
+  /* Font più semplice per distinguersi dal corpo */
+  font-family: Arial, Helvetica, sans-serif;
+  font-style: italic;
+  letter-spacing: 0.05em;
 }
