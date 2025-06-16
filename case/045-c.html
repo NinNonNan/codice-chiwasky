@@ -40,9 +40,17 @@
 
   <script>
     const fileName = location.pathname.split("/").pop().replace(".html", ".json");
-
+  
+    // ✅ DEBUG: Mostra quale file sta cercando di caricare
+    console.log("📁 Caricamento JSON da:", fileName);
+  
     fetch(fileName)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
         document.title = `Rapporto | Agente ${data.agente}`;
         document.getElementById('caso-id').textContent = data.caso;
@@ -51,24 +59,24 @@
         document.getElementById('ora').textContent = data.ora;
         document.getElementById('luogo').textContent = data.luogo;
         document.getElementById('classificazione').textContent = data.classificazione;
-
+  
         document.getElementById('descrizione').textContent = data.descrizione;
-
+  
         const allegatiList = document.getElementById('allegati');
         data.allegati.forEach(item => {
           const li = document.createElement('li');
           li.textContent = item;
           allegatiList.appendChild(li);
         });
-
+  
         document.getElementById('conclusione').textContent = data.conclusione;
         document.getElementById('firma-nome').textContent = data.firma.nome;
         document.getElementById('firma-ruolo').textContent = data.firma.ruolo;
         document.getElementById('firma-divisione').textContent = data.firma.divisione;
       })
       .catch(err => {
-        document.body.innerHTML = "<h2>Errore nel caricamento del rapporto.</h2>";
-        console.error("Errore caricamento JSON:", err);
+        document.body.innerHTML = `<h2>❌ Errore nel caricamento del rapporto JSON.</h2><p>${err.message}</p>`;
+        console.error("🛑 Errore caricamento JSON:", err);
       });
   </script>
 </body>
