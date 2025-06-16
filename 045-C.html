@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rapporto | Agente <span id="titolo-agente">...</span></title>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Rapporto Ufficiale</h1>
+  <h2>Divisione Investigativa - Caso n. <span id="caso-id">...</span></h2>
+
+  <div class="meta">
+    <div><strong>Agente incaricato:</strong> <span id="agente"></span></div>
+    <div><strong>Data:</strong> <span id="data"></span></div>
+    <div><strong>Ora di arrivo:</strong> <span id="ora"></span></div>
+    <div><strong>Località:</strong> <span id="luogo"></span></div>  
+    <div><strong>Classificazione:</strong> <span id="classificazione" class="stamp"></span></div>
+  </div>
+
+  <div class="content">
+    <p id="descrizione"></p>
+
+    <h3>Allegati:</h3>
+    <ul id="allegati"></ul>
+
+    <h3>Conclusione (prima ispezione):</h3>
+    <p id="conclusione"></p>
+    
+    <p><strong>Firmato:</strong><br/>
+    <span id="firma-nome"></span><br/>
+    <span id="firma-ruolo"></span><br/>
+    <span id="firma-divisione"></span></p>
+  </div>
+
+  <footer>
+    Proprietà del Federal Bureau of Investigation – Documento riservato classificato | § Titolo 18 U.S. Code
+  </footer>
+
+  <script>
+    const fileName = location.pathname.split("/").pop().replace(".html", ".json");
+
+    fetch(fileName)
+      .then(res => res.json())
+      .then(data => {
+        document.title = `Rapporto | Agente ${data.agente}`;
+        document.getElementById('caso-id').textContent = data.caso;
+        document.getElementById('agente').textContent = `${data.agente} – ${data.ente}`;
+        document.getElementById('data').textContent = data.data;
+        document.getElementById('ora').textContent = data.ora;
+        document.getElementById('luogo').textContent = data.luogo;
+        document.getElementById('classificazione').textContent = data.classificazione;
+
+        document.getElementById('descrizione').textContent = data.descrizione;
+
+        const allegatiList = document.getElementById('allegati');
+        data.allegati.forEach(item => {
+          const li = document.createElement('li');
+          li.textContent = item;
+          allegatiList.appendChild(li);
+        });
+
+        document.getElementById('conclusione').textContent = data.conclusione;
+        document.getElementById('firma-nome').textContent = data.firma.nome;
+        document.getElementById('firma-ruolo').textContent = data.firma.ruolo;
+        document.getElementById('firma-divisione').textContent = data.firma.divisione;
+      })
+      .catch(err => {
+        document.body.innerHTML = "<h2>Errore nel caricamento del rapporto.</h2>";
+        console.error("Errore caricamento JSON:", err);
+      });
+  </script>
+</body>
+</html>
