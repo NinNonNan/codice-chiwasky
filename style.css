@@ -17,11 +17,36 @@ body {
 /* Titoli principali */
 h1, h2 {
   text-transform: uppercase;
-  margin-bottom: 0.2rem; /* Ridotto drasticamente */
+  margin-bottom: 0.1rem;
   border-bottom: 1px dashed #999;
   padding-bottom: 0.2rem;
   font-weight: normal;
   letter-spacing: 0.05em;
+}
+
+/* Titoli sezioni (Allegati, Conclusione, ecc.) */
+h3 {
+  margin-top: 2.5rem;
+  margin-bottom: 0.1rem;
+  padding-bottom: 0.15rem;
+  font-weight: normal;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-bottom: 1px dotted #999;
+}
+
+/* Riduzione margini paragrafi e liste dopo i titoli */
+h1 + p,
+h2 + p,
+h3 + p,
+h1 + ul,
+h2 + ul,
+h3 + ul {
+  margin-top: 0 !important;
+}
+
+p, ul {
+  margin-top: 0.3rem;
 }
 
 /* Meta informazioni sotto il titolo */
@@ -59,30 +84,8 @@ h1, h2 {
   margin-bottom: 2rem;
 }
 
-/* Titoli sezioni (Allegati, Conclusione, ecc.) */
-h3 {
-  margin-top: 2.5rem;
-  margin-bottom: 0.15rem; /* Ridotto drasticamente */
-  padding-bottom: 0.15rem;
-  font-weight: normal;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  border-bottom: 1px dotted #999;
-}
-
-/* Riduzione spazio tra titoli e testo immediatamente successivo */
-h1 + p,
-h2 + p,
-h3 + p,
-h1 + ul,
-h2 + ul,
-h3 + ul {
-  margin-top: 0.05rem !important; /* Quasi attaccato */
-}
-
 /* Lista degli allegati */
 ul {
-  margin-top: 0;
   padding-left: 1.5rem;
   line-height: 1.5;
 }
