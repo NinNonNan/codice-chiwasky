@@ -17,36 +17,11 @@ body {
 /* Titoli principali */
 h1, h2 {
   text-transform: uppercase;
-  margin-bottom: 0.1rem;
-  border-bottom: 1px dashed #999;
+  margin-bottom: 0.1rem;   /* ridotto margine sotto il titolo */
   padding-bottom: 0.2rem;
+  border-bottom: 1px dashed #999;
   font-weight: normal;
   letter-spacing: 0.05em;
-}
-
-/* Titoli sezioni (Allegati, Conclusione, ecc.) */
-h3 {
-  margin-top: 2.5rem;
-  margin-bottom: 0.1rem;
-  padding-bottom: 0.15rem;
-  font-weight: normal;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  border-bottom: 1px dotted #999;
-}
-
-/* Riduzione margini paragrafi e liste dopo i titoli */
-h1 + p,
-h2 + p,
-h3 + p,
-h1 + ul,
-h2 + ul,
-h3 + ul {
-  margin-top: 0 !important;
-}
-
-p, ul {
-  margin-top: 0.3rem;
 }
 
 /* Meta informazioni sotto il titolo */
@@ -84,8 +59,32 @@ p, ul {
   margin-bottom: 2rem;
 }
 
+/* Titoli sezioni (Allegati, Conclusione, ecc.) */
+h3 {
+  margin-top: 2.5rem;
+  margin-bottom: 0.1rem;   /* margine inferiore molto ridotto */
+  padding-bottom: 0.1rem;
+  font-weight: normal;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-bottom: 1px dotted #999;
+}
+
+/* Rimuove margine alto dei paragrafi che seguono i titoli */
+h1 + p,
+h2 + p,
+h3 + p {
+  margin-top: 0 !important;
+}
+
+/* Paragrafi generali con margini ridotti */
+p {
+  margin: 0.4rem 0;
+}
+
 /* Lista degli allegati */
 ul {
+  margin-top: 0; /* lascia lo spazio gestito da h3 */
   padding-left: 1.5rem;
   line-height: 1.5;
 }
