@@ -78,9 +78,15 @@ p {
 
 ul {
   padding-left: 1.5rem;
-  line-height: 1.5;
   margin-top: 0.5rem;
   margin-bottom: 1rem;
+  line-height: 1.2;        /* linea più stretta */
+}
+
+ul li {
+  margin: 0;               /* rimuove margini tra li */
+  padding: 0;              /* rimuove padding interno */
+  line-height: 1.2;        /* mantiene linea più stretta */
 }
 
 footer {
