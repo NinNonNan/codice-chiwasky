@@ -84,7 +84,7 @@ ul {
 }
 
 ul li {
-  margin: 0 0 0.25rem 0;   /* margine sotto ogni li per un po' di spazio */
+  margin: 0 0 0.5rem 0;    /* margine sotto ogni li aumentato per più spazio */
   padding: 0;              /* rimuove padding interno */
   line-height: 1.2;        /* mantiene linea più stretta */
 }
