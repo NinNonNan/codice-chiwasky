@@ -39,6 +39,13 @@ body {
   overflow: hidden;
 }
 
+/* Evita che singoli blocchi si spezzino a metà pagina */
+.page > * {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+}
+
 /* Titoli e paragrafi: margini ridotti */
 h1 {
   font-size: 1.8rem;
