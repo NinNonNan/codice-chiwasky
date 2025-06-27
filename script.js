@@ -9,61 +9,76 @@ const container = document.getElementById("container");
 let loading = false;
 let hasMorePages = true;
 
-// Calcola altezza effettiva interna (clientHeight) di una .page, inclusi padding
+/**
+ * Calcola l'altezza effettiva interna (clientHeight) di una .page,
+ * inclusi padding, per usarla come soglia di overflow.
+ * Viene creata una pagina temporanea invisibile nel DOM.
+ */
 function computePageHeight() {
   const tmp = document.createElement("div");
   tmp.className = "page";
+  // Deve essere visibile per avere dimensioni corrette ma fuori flusso
   tmp.style.visibility = "hidden";
+  tmp.style.position = "absolute";
+  tmp.style.top = "-9999px";
+  tmp.style.left = "-9999px";
   document.body.appendChild(tmp);
   const h = tmp.clientHeight;
   document.body.removeChild(tmp);
   return h;
 }
 const PAGE_HEIGHT = computePageHeight();
-const SAFE_HEIGHT = PAGE_HEIGHT * 0.95; // margine 5% in basso
+// Sicurezza: margine 5% per evitare overflow dovuti a rendering
+const SAFE_HEIGHT = PAGE_HEIGHT * 0.95;
 
-// Crea una pagina ma NON la appende subito
+/**
+ * Crea un nuovo div .page senza appenderlo immediatamente.
+ * Imposta box-sizing e padding bottom piccolo per minore spazio vuoto.
+ */
 function createPage() {
   const page = document.createElement("div");
   page.classList.add("page");
   page.style.boxSizing = "border-box";
-  page.style.paddingBottom = "0.1rem"; // ridotto padding-bottom per meno spazio
+  page.style.paddingBottom = "0.1rem"; // riduce spazio in fondo
   return page;
 }
 
-// Split helper: frasi
+/**
+ * Funzioni di split per spezzare testo in pezzi più piccoli.
+ * Usate per distribuire meglio il contenuto in pagina evitando troppo spazio vuoto.
+ */
 function splitSentences(text) {
+  // Dividi in frasi con punteggiatura inclusa e spazi finali
   return text.match(/[^.!?]+[.!?]*\s*/g) || [text];
 }
-
-// Split helper: parole
 function splitWords(text) {
+  // Dividi in parole con spazi
   return text.match(/\S+\s*/g) || [text];
 }
-
-// Split helper: caratteri
 function splitChars(text) {
+  // Dividi in singoli caratteri (inclusi spazi)
   return text.split('');
 }
 
 /**
- * Tenta di aggiungere node in page:
- * - se ci sta, ritorna true
- * - se non ci sta:
- *    - se è testo, spezza in frasi, poi parole, poi caratteri
- *    - se è elemento, prova a spezzare figli ricorsivamente
- *    - altrimenti ritorna false
+ * Funzione ricorsiva che tenta di aggiungere node a page rispettando SAFE_HEIGHT.
+ * Se il nodo non ci sta intero, prova a spezzarlo (se testo o elemento).
+ * Ritorna true se node è stato inserito parzialmente o totalmente,
+ * false se non ci sta niente.
  */
 function appendNode(node, page) {
   page.appendChild(node);
-  if (page.scrollHeight <= SAFE_HEIGHT) return true;
+  if (page.scrollHeight <= SAFE_HEIGHT) {
+    return true;
+  }
 
+  // Nodo troppo grande, rimuovo e provo a spezzare
   page.removeChild(node);
 
   if (node.nodeType === Node.TEXT_NODE) {
     const text = node.textContent;
 
-    // 1) Prova frasi
+    // 1) Provo a spezzare per frasi
     const sentences = splitSentences(text);
     if (sentences.length > 1) {
       for (const sentence of sentences) {
@@ -73,7 +88,7 @@ function appendNode(node, page) {
       return true;
     }
 
-    // 2) Prova parole
+    // 2) Provo a spezzare per parole
     const words = splitWords(text);
     if (words.length > 1) {
       for (const word of words) {
@@ -83,7 +98,7 @@ function appendNode(node, page) {
       return true;
     }
 
-    // 3) Prova caratteri
+    // 3) Provo a spezzare per caratteri
     const chars = splitChars(text);
     for (const ch of chars) {
       const txtNode = document.createTextNode(ch);
@@ -99,12 +114,13 @@ function appendNode(node, page) {
       return false;
     }
 
-    // Clona nodo senza figli
+    // Clono il nodo senza figli per inserirlo provvisoriamente
     const clone = node.cloneNode(false);
     page.appendChild(clone);
 
     for (const child of children) {
       if (!appendNode(child.cloneNode(true), clone)) {
+        // Se un figlio non ci sta, rimuovo clone e ritorno false
         page.removeChild(clone);
         return false;
       }
@@ -112,14 +128,14 @@ function appendNode(node, page) {
     return true;
   }
 
-  // Se non è testo né elemento, ritorna false
+  // Se tipo nodo non gestito, ritorna false
   return false;
 }
 
 /**
- * Paginazione per liste UL:
- * Aggiunge LI uno per uno, spostando quelli che non ci stanno in pagine successive.
- * Ritorna array di pagine generate, nessuna duplicazione di LI.
+ * Funzione speciale per paginare liste UL.
+ * Evita di duplicare li e spezza la lista solo a livello di LI.
+ * Ritorna array di pagine generate.
  */
 function paginateList(ul) {
   const pages = [];
@@ -147,7 +163,7 @@ function paginateList(ul) {
     }
   }
 
-  // Spingo anche l'ultima pagina (che può essere parziale)
+  // Spingo anche l'ultima pagina (parziale)
   if (list.childNodes.length > 0 && !pages.includes(page)) {
     pages.push(page);
   }
@@ -156,7 +172,9 @@ function paginateList(ul) {
 }
 
 /**
- * Converte l'HTML Markdown in pagine `.page`, appendendole.
+ * Converte l'HTML Markdown in pagine `.page`, appendendole al container.
+ * Usa appendNode per tentare di spezzare elementi grandi,
+ * e paginateList per UL.
  */
 function paginateHTML(html) {
   const wrapper = document.createElement("div");
@@ -166,15 +184,16 @@ function paginateHTML(html) {
 
   for (const child of Array.from(wrapper.childNodes)) {
     if (child.nodeType === Node.ELEMENT_NODE && child.tagName === "UL") {
-      // paginateList ritorna array di pagine, le aggiungiamo tutte
+      // paginateList ritorna array di pagine
       const listPages = paginateList(child);
-      // prima aggiungiamo pagina corrente se ha contenuto
+      // Se pagina corrente ha contenuto, la salvo prima
       if (page.childNodes.length) pages.push(page);
-      // aggiungiamo tutte le pagine generate dalla lista
+      // Aggiungo tutte le pagine generate dalla lista
       pages.push(...listPages);
-      // ripartiamo da pagina vuota
+      // Riparto da pagina vuota
       page = createPage();
     } else {
+      // Provo ad aggiungere nodo. Se non ci sta tutto, creo nuova pagina
       if (!appendNode(child.cloneNode(true), page)) {
         pages.push(page);
         page = createPage();
@@ -185,13 +204,14 @@ function paginateHTML(html) {
 
   if (page.childNodes.length) pages.push(page);
 
+  // Infine appendo tutte le pagine generate al container
   for (const p of pages) {
     container.appendChild(p);
   }
 }
 
 /**
- * Carica e paginizza il prossimo file Markdown.
+ * Carica e paginizza il file markdown successivo.
  */
 async function loadNextPage() {
   if (loading || !hasMorePages) return;
@@ -215,7 +235,7 @@ async function loadNextPage() {
 }
 
 /**
- * Precarica finché non compare lo scroll.
+ * Precarica finché non compare scroll (contenuto sufficiente)
  */
 async function preload() {
   while (document.body.scrollHeight <= window.innerHeight && hasMorePages) {
@@ -223,7 +243,10 @@ async function preload() {
   }
 }
 
+// Carico la prima volta a DOMContentLoaded
 window.addEventListener("DOMContentLoaded", preload);
+
+// Carico pagine successive quando sto vicino al fondo (300px)
 window.addEventListener("scroll", () => {
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
     loadNextPage();
