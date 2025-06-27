@@ -108,6 +108,16 @@ function appendNode(node, page) {
   }
 
   if (node.nodeType === Node.ELEMENT_NODE) {
+    // Gestione speciale per UL (liste), spezzando solo a livello LI
+    if (node.tagName === "UL") {
+      const pages = paginateList(node);
+      for (const p of pages) {
+        container.appendChild(p);
+      }
+      // UL è gestito completamente, non serve inserirlo qui
+      return true;
+    }
+
     const children = Array.from(node.childNodes);
     if (children.length === 0) {
       // Elemento vuoto o non spezzabile
