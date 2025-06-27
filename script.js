@@ -27,18 +27,67 @@ function createPage() {
 }
 
 /**
- * Funzione helper per spezzare un nodo di testo in frasi
- * (divide per punto seguito da spazio, mantenendo la punteggiatura).
+ * Funzione helper per spezzare un nodo di testo in frasi (o segmenti più piccoli).
  */
-function splitTextIntoSentences(text) {
-  // Usa una regex semplice per dividere per punti + spazio/newline
+function splitTextIntoSegments(text) {
+  // Divido in frasi o segmenti più piccoli per miglior controllo
   return text.match(/[^.!?]+[.!?]*\s*/g) || [text];
+}
+
+/**
+ * Funzione ricorsiva che prova ad aggiungere un nodo dentro una pagina.
+ * Se il nodo supera l'altezza massima, prova a spezzarlo in nodi più piccoli.
+ * 
+ * @param {Node} node Nodo da inserire
+ * @param {HTMLElement} page Pagina corrente
+ * @returns {boolean} True se il nodo è stato inserito completamente, False se serve nuova pagina
+ */
+function tryAppendNode(node, page) {
+  page.appendChild(node);
+
+  if (page.scrollHeight <= PAGE_HEIGHT) {
+    // Tutto ok, nodo inserito senza problemi
+    return true;
+  } else {
+    // Nodo troppo grande, rimuovo
+    page.removeChild(node);
+
+    if (node.nodeType === Node.TEXT_NODE) {
+      // Nodo testo troppo lungo: spezza in segmenti e prova uno per uno
+      const segments = splitTextIntoSegments(node.textContent);
+      for (const segment of segments) {
+        const span = document.createTextNode(segment);
+        if (!tryAppendNode(span, page)) {
+          // Nodo non inserito => serve nuova pagina
+          return false;
+        }
+      }
+      return true;
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      // Nodo elemento con figli: prova a spezzare figli
+      const children = Array.from(node.childNodes);
+      const clone = node.cloneNode(false); // clone senza figli
+      page.appendChild(clone);
+
+      for (const child of children) {
+        if (!tryAppendNode(child.cloneNode(true), clone)) {
+          // Figlio non inserito => serve nuova pagina
+          page.removeChild(clone);
+          return false;
+        }
+      }
+      // Tutti i figli inseriti bene
+      return true;
+    } else {
+      // Nodo di altro tipo non gestito, non inseribile
+      return false;
+    }
+  }
 }
 
 /**
  * Suddivide l'HTML generato dal Markdown in più pagine
  * in base all'altezza fissa predefinita.
- * Spezza testi troppo lunghi per evitare tagli.
  */
 function paginateHTML(html) {
   const temp = document.createElement("div");
@@ -48,32 +97,14 @@ function paginateHTML(html) {
   container.appendChild(current);
 
   for (const node of Array.from(temp.childNodes)) {
-    // Se il nodo è un testo lungo, spezzalo in frasi
-    if (node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0) {
-      const sentences = splitTextIntoSentences(node.textContent);
-      for (const sentence of sentences) {
-        const span = document.createElement("span");
-        span.textContent = sentence;
-
-        current.appendChild(span);
-        if (current.scrollHeight > PAGE_HEIGHT) {
-          current.removeChild(span);
-          current = createPage();
-          container.appendChild(current);
-          current.appendChild(span);
-        }
-      }
-    }
-    else {
-      // Nodo elemento: aggiungi intero nodo
-      current.appendChild(node);
-
-      // Se supera altezza, sposta il nodo in una nuova pagina
-      if (current.scrollHeight > PAGE_HEIGHT) {
-        current.removeChild(node);
-        current = createPage();
-        container.appendChild(current);
-        current.appendChild(node);
+    if (!tryAppendNode(node.cloneNode(true), current)) {
+      // Nodo non inserito => creo nuova pagina e riprovo
+      current = createPage();
+      container.appendChild(current);
+      const success = tryAppendNode(node.cloneNode(true), current);
+      // Se neanche nella pagina nuova va, lo spezzamento è stato fatto ricorsivamente in tryAppendNode
+      if (!success) {
+        console.warn("Non è stato possibile inserire il nodo, anche spezzandolo", node);
       }
     }
   }
@@ -84,35 +115,28 @@ function paginateHTML(html) {
  * Aggiunge il contenuto al DOM, suddiviso in più blocchi di pagina se necessario.
  */
 async function loadNextPage() {
-  // Evita caricamenti multipli o inutili se non ci sono più pagine
   if (loading || !hasMorePages) return false;
   loading = true;
 
   try {
-    // Tenta di caricare il file Markdown corrente
     const response = await fetch(`notes/${currentPage}.md`);
-    
-    // Se il file non esiste (es. 404), interrompe il caricamento futuro
+
     if (!response.ok) {
       hasMorePages = false;
       loading = false;
       return false;
     }
 
-    // Converte il testo Markdown in HTML
     const markdown = await response.text();
     const html = marked.parse(markdown);
 
-    // Suddivide il contenuto HTML in blocchi-pagina
     paginateHTML(html);
 
-    // Passa alla pagina successiva
     currentPage++;
     loading = false;
     return true;
 
   } catch (e) {
-    // In caso di errore imprevisto (es. rete), log e blocco caricamenti futuri
     console.error(`Errore durante il caricamento della pagina ${currentPage}:`, e);
     hasMorePages = false;
     loading = false;
@@ -125,26 +149,18 @@ async function loadNextPage() {
  * Utile al primo caricamento, se il contenuto iniziale è troppo corto.
  */
 async function preloadUntilScrollable() {
-  while (
-    document.body.scrollHeight <= window.innerHeight &&
-    hasMorePages
-  ) {
+  while (document.body.scrollHeight <= window.innerHeight && hasMorePages) {
     const success = await loadNextPage();
     if (!success) break;
   }
 }
 
-// Quando la pagina è caricata, inizia a caricare le prime pagine
 window.addEventListener("DOMContentLoaded", () => {
   preloadUntilScrollable();
 });
 
-// Quando l'utente si avvicina al fondo, carica una nuova pagina
 window.addEventListener("scroll", () => {
-  if (
-    window.innerHeight + window.scrollY >=
-    document.body.offsetHeight - 300
-  ) {
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
     loadNextPage();
   }
 });
