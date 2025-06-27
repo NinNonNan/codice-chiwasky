@@ -28,9 +28,9 @@ function computePageHeight() {
   return h;
 }
 
-const PAGE_HEIGHT = computePageHeight();            // Altezza totale del foglio
-const RESERVED_SPACE = Math.round(PAGE_HEIGHT * 0.05); // 5% di PAGE_HEIGHT
-const MAX_RECURSION_DEPTH = 10;                     // Profondità massima per evitare loop infiniti
+const PAGE_HEIGHT = computePageHeight(); // Altezza totale del foglio
+const RESERVED_SPACE = 20;               // Riserviamo sempre 20px in fondo
+const MAX_RECURSION_DEPTH = 10;          // Profondità massima per evitare loop infiniti
 
 /**
  * Crea un nuovo blocco pagina vuoto e lo restituisce.
