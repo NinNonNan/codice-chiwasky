@@ -1,44 +1,58 @@
+/* Definizione font personalizzato */
 @font-face {
   font-family: 'HomemadeApple';
   src: url('./fonts/HomemadeApple.woff2') format('woff2'),
        url('./fonts/HomemadeApple.woff') format('woff');
   font-weight: normal;
   font-style: normal;
-  font-display: swap;
+  font-display: swap; /* Permette il caricamento progressivo del font */
 }
 
+/* Stili base del body: sfondo con texture carta, font cursive */
 body {
   margin: 0;
-  padding: 0;
+  padding: 2rem; /* padding per non attaccarsi ai bordi */
   background: #f7f2e4 url('./images/paper-texture.jpg') repeat;
   font-family: 'HomemadeApple', cursive;
   font-size: 1.1rem;
   color: #2e2b26;
   line-height: 1.8;
-  padding: 2rem;
+  
+  /* Centriamo il contenuto orizzontalmente */
   display: flex;
   justify-content: center;
 }
 
+/* Stile delle pagine (blocchi di appunti) */
+/* 
+   Larghezza e altezza sono indicative di un formato taccuino tascabile (circa A6),
+   ma puoi adattarle in base al layout. 
+   Importante: overflow hidden per evitare scroll interni e margin-bottom per lo spazio tra pagine.
+*/
 .page {
-  background-color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.85); /* sfondo semi-trasparente carta */
   background-image: 
     linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
-  background-size: 20px 20px;
-  width: 600px;
-  min-height: 800px;
-  max-height: 800px;
-  padding: 3rem 2rem;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
-  border: 1px solid #ccc;
-  position: relative;
-  box-sizing: border-box;
-  overflow: hidden;
-  margin-bottom: 4rem;
-  overflow-wrap: break-word;
+  background-size: 20px 20px; /* griglia a quadretti leggera */
+
+  width: 400px;      /* larghezza simile a un taccuino A6 */
+  min-height: 560px; /* altezza A6 approssimativa */
+  max-height: 560px; /* altezza fissa per paginazione */
+  
+  padding: 3rem 2rem; /* padding per il contenuto interno */
+  
+  box-shadow: 0 0 20px rgba(0,0,0,0.2); /* ombra delicata */
+  border: 1px solid #ccc; /* bordo sottile */
+  position: relative; 
+  box-sizing: border-box; /* include padding e bordi nelle dimensioni */
+  
+  overflow: hidden; /* niente scroll interno */
+  margin-bottom: 4rem; /* spazio tra pagine */
+  overflow-wrap: break-word; /* evita overflow testo */
 }
 
+/* Titoli h1 centrati con sottolineatura */
 h1 {
   font-size: 2rem;
   margin-bottom: 1.5rem;
@@ -46,12 +60,14 @@ h1 {
   text-decoration: underline;
 }
 
+/* Paragrafi con rientro e gestione delle interruzioni di linea */
 p {
   margin: 1rem 0;
   text-indent: 2rem;
   white-space: pre-line;
 }
 
+/* Macchie d’inchiostro decorative posizionate in basso a sinistra */
 .smudge {
   position: absolute;
   bottom: 10%;
@@ -62,6 +78,7 @@ p {
   opacity: 0.2;
 }
 
+/* Classe per taglio testo con ellissi (non usata attualmente) */
 .cutoff {
   position: relative;
   overflow: hidden;
@@ -70,12 +87,10 @@ p {
   max-width: 85%;
 }
 
-/* Rimuoviamo questa: non serve più */
+/* Rimuoviamo completamente la linea artefatto e la linea verticale */
 .artifact-line {
   display: none;
 }
-
-/* Anche la linea verticale */
 .page::before {
   display: none;
 }
