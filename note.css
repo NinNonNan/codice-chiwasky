@@ -17,80 +17,68 @@ body {
   font-size: 1.1rem;
   color: #2e2b26;
   line-height: 1.8;
-  
+
   /* Centriamo il contenuto orizzontalmente */
   display: flex;
   justify-content: center;
 }
 
-/* Stile delle pagine (blocchi di appunti) */
-/* 
-   Larghezza e altezza sono indicative di un formato taccuino tascabile (circa A6),
-   ma puoi adattarle in base al layout. 
-   Importante: overflow hidden per evitare scroll interni e margin-bottom per lo spazio tra pagine.
+/* Stile delle pagine (blocchi di appunti tascabili) */
+/*
+   Manteniamo il form factor A6 tramite aspect-ratio,
+   in modo che si adatti al tuo layout web responsive.
 */
 .page {
   background-color: rgba(255, 255, 255, 0.85); /* sfondo semi-trasparente carta */
-  background-image: 
+  background-image:
     linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
   background-size: 20px 20px; /* griglia a quadretti leggera */
 
-  width: 400px;      /* larghezza simile a un taccuino A6 */
-  min-height: 560px; /* altezza A6 approssimativa */
-  max-height: 560px; /* altezza fissa per paginazione */
-  
-  padding: 3rem 2rem; /* padding per il contenuto interno */
-  
-  box-shadow: 0 0 20px rgba(0,0,0,0.2); /* ombra delicata */
+  width: 100%;            /* prendiamo tutta la larghezza disponibile */
+  max-width: 400px;       /* massimo circa tascabile */
+  aspect-ratio: 105 / 148; /* proporzioni per A6 */
+
+  padding: 2rem;          /* spazio interno generoso */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* ombra delicata */
   border: 1px solid #ccc; /* bordo sottile */
-  position: relative; 
   box-sizing: border-box; /* include padding e bordi nelle dimensioni */
-  
-  overflow: hidden; /* niente scroll interno */
-  margin-bottom: 4rem; /* spazio tra pagine */
+
+  position: relative;
+  overflow: hidden;       /* niente scroll interno */
+  margin-bottom: 2rem;    /* spazio tra pagine */
   overflow-wrap: break-word; /* evita overflow testo */
 }
 
 /* Titoli h1 centrati con sottolineatura */
 h1 {
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
   text-align: center;
   text-decoration: underline;
 }
 
-/* Paragrafi con rientro e gestione delle interruzioni di linea */
+/* Paragrafi con rientro ed effetto “appunto” */
 p {
-  margin: 1rem 0;
-  text-indent: 2rem;
+  margin: 0.8rem 0;
+  text-indent: 1.5rem;
   white-space: pre-line;
 }
 
 /* Macchie d’inchiostro decorative posizionate in basso a sinistra */
 .smudge {
   position: absolute;
-  bottom: 10%;
-  left: 15%;
-  width: 80px;
-  height: 40px;
+  bottom: 8%;
+  left: 10%;
+  width: 60px;
+  height: 30px;
   background: url('./images/ink-smudge.png') no-repeat center/contain;
   opacity: 0.2;
 }
 
-/* Classe per taglio testo con ellissi (non usata attualmente) */
-.cutoff {
-  position: relative;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  max-width: 85%;
-}
-
-/* Rimuoviamo completamente la linea artefatto e la linea verticale */
-.artifact-line {
-  display: none;
-}
+/* Rimuoviamo le classi non più utilizzate */
+.cutoff,
+.artifact-line,
 .page::before {
   display: none;
 }
