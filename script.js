@@ -29,7 +29,7 @@ function computePageHeight() {
 }
 
 const PAGE_HEIGHT = computePageHeight();
-const MAX_RECURSION_DEPTH = 10; 
+const MAX_RECURSION_DEPTH = 10;  // Profondità massima per evitare loop infiniti
 
 /**
  * Crea un nuovo blocco pagina vuoto e lo restituisce.
@@ -57,7 +57,8 @@ function splitTextToChunks(text, maxLength = 100) {
 
 /**
  * Funzione ricorsiva che prova ad aggiungere un nodo dentro una pagina.
- * Se supera l'altezza, prova a spezzarlo.
+ * Se il nodo supera l'altezza massima, prova a spezzarlo in nodi più piccoli.
+ * Limita la profondità per evitare ricorsione infinita.
  */
 function tryAppendNode(node, page, depth = 0) {
   if (depth > MAX_RECURSION_DEPTH) return false;
@@ -69,54 +70,60 @@ function tryAppendNode(node, page, depth = 0) {
     if (node.textContent.length <= 20) return false;
     const chunks = splitTextToChunks(node.textContent, 50);
     for (let i = 0; i < chunks.length; i++) {
-      const txt = document.createTextNode(chunks[i]);
-      if (!tryAppendNode(txt, page, depth+1)) return false;
+      const txtNode = document.createTextNode(chunks[i]);
+      if (!tryAppendNode(txtNode, page, depth + 1)) {
+        return false; // il resto verrà gestito dalla pagina successiva
+      }
     }
     return true;
   } 
-  else if (node.nodeType === Node.ELEMENT_NODE) {
-    // Non UL: spezza figli
-    if (node.tagName !== 'UL') {
-      const children = Array.from(node.childNodes);
-      const clone = node.cloneNode(false);
-      page.appendChild(clone);
-      for (const child of children) {
-        if (!tryAppendNode(child.cloneNode(true), clone, depth+1)) {
-          page.removeChild(clone);
-          return false;
-        }
+  else if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'UL') {
+    // Elementi non-UL: spezza figli
+    const children = Array.from(node.childNodes);
+    const clone = node.cloneNode(false);
+    page.appendChild(clone);
+    for (const child of children) {
+      if (!tryAppendNode(child.cloneNode(true), clone, depth + 1)) {
+        page.removeChild(clone);
+        return false;
       }
-      return true;
     }
-    // UL: prendo i <li> uno ad uno
-    else {
-      const items = Array.from(node.children);
-      let wrapper = document.createElement('ul');
-      wrapper.style.paddingLeft = getComputedStyle(node).paddingLeft || '1.5rem';
-      page.appendChild(wrapper);
-
-      for (const li of items) {
-        const liClone = li.cloneNode(true);
-        // se non entra, nuova pagina + nuovo wrapper
-        if (!tryAppendNode(liClone, wrapper, depth+1)) {
-          // sposto wrapper rimanente:
-          page.removeChild(wrapper);
-          page = createPage();
-          container.appendChild(page);
-          wrapper = document.createElement('ul');
-          wrapper.style.paddingLeft = getComputedStyle(node).paddingLeft || '1.5rem';
-          page.appendChild(wrapper);
-          // riprovo il li su nuova pagina
-          if (!tryAppendNode(liClone, wrapper, depth+1)) {
-            console.warn("LI troppo grande anche da solo:", liClone);
-            wrapper.appendChild(liClone);
-          }
-        }
-      }
-      return true;
-    }
+    return true;
   }
-  return false;
+
+  // Se è UL, gestiamo i <li> uno a uno, senza duplicazioni
+  if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'UL') {
+    const listItems = Array.from(node.children);
+    let currentList = document.createElement('ul');
+    // Copio gli stili base della UL originale (se necessari)
+    currentList.className = node.className;
+    page.appendChild(currentList);
+
+    for (const li of listItems) {
+      const liClone = li.cloneNode(true);
+      currentList.appendChild(liClone);
+
+      // Se ora la pagina trabocca, rimuovo liClone e creo nuova pagina e nuova lista
+      if (page.scrollHeight > PAGE_HEIGHT) {
+        currentList.removeChild(liClone);
+
+        // Nuova pagina
+        page = createPage();
+        container.appendChild(page);
+
+        // Nuova lista
+        currentList = document.createElement('ul');
+        currentList.className = node.className;
+        page.appendChild(currentList);
+
+        // Inserisco liClone nella nuova lista
+        currentList.appendChild(liClone);
+      }
+    }
+    return true;
+  }
+
+  return false; // altri nodi non gestiti
 }
 
 /**
@@ -126,60 +133,67 @@ function tryAppendNode(node, page, depth = 0) {
 function paginateHTML(html) {
   const temp = document.createElement("div");
   temp.innerHTML = html;
+
   let current = createPage();
   container.appendChild(current);
 
-  for (const node of Array.from(temp.childNodes)) {
-    if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'UL') {
-      // gestito dentro tryAppendNode
-      tryAppendNode(node.cloneNode(true), current);
-      // se serve nuova pagina, tryAppendNode gestisce internamente
-      if (pageOverflow(current)) {
-        current = createPage();
-        container.appendChild(current);
-        tryAppendNode(node.cloneNode(true), current);
-      }
-    } else {
-      if (!tryAppendNode(node.cloneNode(true), current)) {
-        current = createPage();
-        container.appendChild(current);
-        tryAppendNode(node.cloneNode(true), current);
-      }
+  for (const origNode of Array.from(temp.childNodes)) {
+    const node = origNode.cloneNode(true);
+
+    if (!tryAppendNode(node, current)) {
+      // Nodo non inserito => nuova pagina e reinserimento
+      current = createPage();
+      container.appendChild(current);
+      tryAppendNode(node, current);
     }
   }
 }
 
-/**  
- * Utility per verificare overflow  
+/**
+ * Carica il prossimo file Markdown e lo converte in HTML.
  */
-function pageOverflow(page) {
-  return page.scrollHeight > PAGE_HEIGHT;
-}
-
 async function loadNextPage() {
-  if (loading || !hasMorePages) return;
+  if (loading || !hasMorePages) return false;
   loading = true;
+
   try {
     const res = await fetch(`notes/${currentPage}.md`);
-    if (!res.ok) { hasMorePages = false; return; }
+    if (!res.ok) {
+      hasMorePages = false;
+      loading = false;
+      return false;
+    }
+
     const md = await res.text();
     const html = marked.parse(md);
     paginateHTML(html);
+
     currentPage++;
+    loading = false;
+    return true;
+
   } catch (e) {
-    console.error(e);
+    console.error(`Errore caricamento pagina ${currentPage}:`, e);
     hasMorePages = false;
+    loading = false;
+    return false;
   }
-  loading = false;
 }
 
+/**
+ * Precarica pagine finché la pagina non è abbastanza lunga da poter scorrere.
+ */
 async function preloadUntilScrollable() {
   while (document.body.scrollHeight <= window.innerHeight && hasMorePages) {
-    await loadNextPage();
+    const ok = await loadNextPage();
+    if (!ok) break;
   }
 }
 
-window.addEventListener("DOMContentLoaded", () => { preloadUntilScrollable(); });
+window.addEventListener("DOMContentLoaded", () => {
+  preloadUntilScrollable();
+});
+
 window.addEventListener("scroll", () => {
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
     loadNextPage();
