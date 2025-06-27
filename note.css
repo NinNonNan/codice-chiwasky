@@ -34,6 +34,7 @@ body {
   position: relative;
   box-sizing: border-box;
   overflow: hidden;
+  margin-bottom: 4rem; /* 👈 Spazio tra le pagine */
 }
 
 h1 {
