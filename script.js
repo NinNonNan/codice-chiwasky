@@ -28,7 +28,7 @@ function createPage() {
   page.classList.add("page");
   page.style.boxSizing = "border-box";
   // Riduciamo il padding-bottom a un valore piccolo o zero
-  page.style.paddingBottom = "0.3rem"; // o "0" se preferisci
+  page.style.paddingBottom = "0.1rem"; // o "0" se preferisci
   return page;
 }
 
