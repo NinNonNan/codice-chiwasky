@@ -14,10 +14,6 @@ function computePageHeight() {
   const tmp = document.createElement("div");
   tmp.className = "page";
   tmp.style.visibility = "hidden";
-  tmp.style.position = "absolute";
-  tmp.style.top = "0";
-  tmp.style.left = "0";
-  tmp.style.width = "100%";
   document.body.appendChild(tmp);
   const h = tmp.clientHeight;
   document.body.removeChild(tmp);
@@ -55,11 +51,13 @@ function splitChars(text) {
  * - se ci sta, ritorna true
  * - se non ci sta:
  *    - se è testo, spezza in frasi, poi parole, poi caratteri
+ *    - se è elemento, prova a spezzare figli ricorsivamente
  *    - altrimenti ritorna false
  */
 function appendNode(node, page) {
   page.appendChild(node);
   if (page.scrollHeight <= SAFE_HEIGHT) return true;
+
   page.removeChild(node);
 
   if (node.nodeType === Node.TEXT_NODE) {
@@ -94,7 +92,27 @@ function appendNode(node, page) {
     return true;
   }
 
-  // Se non è testo e non ci sta, ritorna false
+  if (node.nodeType === Node.ELEMENT_NODE) {
+    const children = Array.from(node.childNodes);
+    if (children.length === 0) {
+      // Elemento vuoto o non spezzabile
+      return false;
+    }
+
+    // Clona nodo senza figli
+    const clone = node.cloneNode(false);
+    page.appendChild(clone);
+
+    for (const child of children) {
+      if (!appendNode(child.cloneNode(true), clone)) {
+        page.removeChild(clone);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Se non è testo né elemento, ritorna false
   return false;
 }
 
