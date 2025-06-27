@@ -28,9 +28,16 @@ function computePageHeight() {
   return h;
 }
 
-const PAGE_HEIGHT = computePageHeight(); // Altezza totale del foglio
-const RESERVED_SPACE = 20;               // Riserviamo sempre 20px in fondo
-const MAX_RECURSION_DEPTH = 10;          // Profondità massima per evitare loop infiniti
+const PAGE_HEIGHT = computePageHeight();   // Altezza totale del foglio (CSS driven)
+const RESERVED_PERCENT = 0.02;             // 2% di spazio riservato in fondo
+const MAX_RECURSION_DEPTH = 10;            // Profondità massima per evitare loop infiniti
+
+/**
+ * Calcola lo spazio riservato in px, in base all'altezza effettiva di ciascun foglio.
+ */
+function computeReservedSpace(page) {
+  return Math.round(page.offsetHeight * RESERVED_PERCENT);
+}
 
 /**
  * Crea un nuovo blocco pagina vuoto e lo restituisce.
@@ -61,7 +68,8 @@ function splitTextToChunks(text, maxLength = 100) {
  * la parte utilizzabile (escludendo lo spazio riservato).
  */
 function isOverflowing(page) {
-  return page.scrollHeight > (PAGE_HEIGHT - RESERVED_SPACE);
+  const reserved = computeReservedSpace(page);
+  return page.scrollHeight > (page.offsetHeight - reserved);
 }
 
 /**
