@@ -27,7 +27,8 @@ function createPage() {
   const page = document.createElement("div");
   page.classList.add("page");
   page.style.boxSizing = "border-box";
-  page.style.paddingBottom = "1.5rem"; // margine inferiore
+  // Riduciamo il padding-bottom a un valore piccolo o zero
+  page.style.paddingBottom = "0.3rem"; // o "0" se preferisci
   return page;
 }
 
