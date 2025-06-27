@@ -28,13 +28,15 @@ body {
   background-size: 20px 20px;
   width: 600px;
   min-height: 800px;
+  max-height: 800px;
   padding: 3rem 2rem;
   box-shadow: 0 0 20px rgba(0,0,0,0.2);
   border: 1px solid #ccc;
   position: relative;
   box-sizing: border-box;
   overflow: hidden;
-  margin-bottom: 4rem; /* 👈 Spazio tra le pagine */
+  margin-bottom: 4rem;
+  overflow-wrap: break-word;
 }
 
 h1 {
