@@ -1,16 +1,17 @@
 @font-face {
-  font-family: 'StrokifyLight';
-  src: url('./fonts/Strokify-LightDemo.woff2') format('woff2'),
-       url('./fonts/Strokify-LightDemo.woff') format('woff');
+  font-family: 'HomemadeApple';
+  src: url('./fonts/HomemadeApple.woff2') format('woff2'),
+       url('./fonts/HomemadeApple.woff') format('woff');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 body {
   margin: 0;
   padding: 0;
   background: #f7f2e4 url('./images/paper-texture.jpg') repeat;
-  font-family: 'StrokifyLight', cursive;
+  font-family: 'HomemadeApple', cursive;
   font-size: 1.1rem;
   color: #2e2b26;
   line-height: 1.8;
