@@ -5,81 +5,73 @@
        url('./fonts/HomemadeApple.woff') format('woff');
   font-weight: normal;
   font-style: normal;
-  font-display: swap; /* Permette il caricamento progressivo del font */
+  font-display: swap;
 }
 
-/* Stili base del body: sfondo con texture carta, font cursive */
+/* Stili base del body */
 body {
   margin: 0;
-  padding: 2rem; /* padding per non attaccarsi ai bordi */
+  padding: 2rem;
   background: #f7f2e4 url('./images/paper-texture.jpg') repeat;
   font-family: 'HomemadeApple', cursive;
   color: #2e2b26;
   line-height: 1.6;
-
-  /* Centriamo il contenuto orizzontalmente */
   display: flex;
   justify-content: center;
 }
 
-/* Stile dei fogli tascabili (A6-like) */
-/*
-   Qui imponiamo un aspect-ratio A6 (105×148) combinato con width fissa o fluida,
-   e aggiungiamo overflow:hidden per mantenere l'altezza costante.
-   Aggiungiamo anche height per farlo coincidere esattamente in pixel:
-   height = max-width × 148/105 ≈ 400px * 148/105 ≈ 564px
-*/
+/* Foglio tascabile A6 (aspect-ratio mantenuto via height e width calcolati) */
 .page {
-  background-color: rgba(255, 255, 255, 0.85); /* sfondo semi-trasparente carta */
-  background-image:
-    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
-  background-size: 20px 20px; /* griglia a quadretti leggera */
-
   width: 100%;
-  max-width: 400px;                    /* dimensione massima tascabile */
-  aspect-ratio: 105 / 148;             /* proporzioni esatte A6 */
-  height: calc(400px * 148 / 105);     /* altezza A6 esatta in px */
-
-  /* Impediamo che la pagina cresca in altezza oltre il suo form factor */
-  overflow: hidden;
-  box-sizing: border-box;              /* include padding e bordi nelle dimensioni */
-
-  padding: 2rem;                       /* spazio interno generoso */
-  margin-bottom: 2rem;                 /* spazio tra i fogli */
-  box-shadow: 0 0 10px rgba(0,0,0,0.2); /* ombra delicata */
-  border: 1px solid #ccc;              /* bordo sottile */
+  max-width: 400px;                          /* massima larghezza “tascabile” */
+  height: calc(400px * 148 / 105);           /* altezza A6 esatta */
+  padding: 2rem 2rem 1rem;                   /* bottom padding riserva spazio */
+  box-sizing: border-box;
+  background-color: rgba(255,255,255,0.85);
+  background-image:
+    linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  border: 1px solid #ccc;
   position: relative;
-  overflow-wrap: break-word;           /* evita overflow testo */
+  margin-bottom: 2rem;
+  overflow: hidden;    /* taglia, ma il JS sposta in pagina nuova */
 }
 
-/* Titoli centrati con sottolineatura */
+/* Titoli e paragrafi */
 h1 {
   font-size: 1.8rem;
   margin-bottom: 1rem;
   text-align: center;
   text-decoration: underline;
 }
-
-/* Paragrafi con rientro ed effetto “appunto” */
 p {
   margin: 0.8rem 0;
   text-indent: 1.5rem;
   white-space: pre-line;
 }
 
-/* Macchie d’inchiostro decorative posizionate in basso a sinistra */
+/* Liste */
+ul {
+  margin: 0.8rem 0 0.8rem 1.5rem;
+}
+li {
+  margin-bottom: 0.4rem;
+}
+
+/* Decorative smudge */
 .smudge {
   position: absolute;
-  bottom: 8%;
-  left: 10%;
+  bottom: 2rem;  /* rispetta il padding-bottom */
+  left: 1.5rem;
   width: 60px;
   height: 30px;
   background: url('./images/ink-smudge.png') no-repeat center/contain;
   opacity: 0.2;
 }
 
-/* Rimuoviamo le classi non più necessarie */
+/* Rimuoviamo elementi non più necessari */
 .cutoff,
 .artifact-line,
 .page::before {
