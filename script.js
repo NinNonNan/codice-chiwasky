@@ -27,21 +27,30 @@ function createPage() {
   const page = document.createElement("div");
   page.classList.add("page");
   page.style.boxSizing = "border-box";
-  // Riduciamo il padding-bottom a un valore piccolo o zero
-  page.style.paddingBottom = "0.1rem"; // o "0" se preferisci
+  page.style.paddingBottom = "0.1rem"; // ridotto padding-bottom per meno spazio
   return page;
 }
 
-// Spezza testo in segmenti più piccoli (frasi)
-function splitText(text) {
+// Split helper: frasi
+function splitSentences(text) {
   return text.match(/[^.!?]+[.!?]*\s*/g) || [text];
+}
+
+// Split helper: parole
+function splitWords(text) {
+  return text.match(/\S+\s*/g) || [text];
+}
+
+// Split helper: caratteri
+function splitChars(text) {
+  return text.split('');
 }
 
 /**
  * Tenta di aggiungere node in page:
  * - se ci sta, ritorna true
  * - se non ci sta:
- *    - se è testo, spezza e prova segmento per segmento
+ *    - se è testo, spezza in frasi, poi parole, poi caratteri
  *    - altrimenti ritorna false
  */
 function appendNode(node, page) {
@@ -50,16 +59,38 @@ function appendNode(node, page) {
   page.removeChild(node);
 
   if (node.nodeType === Node.TEXT_NODE) {
-    const segments = splitText(node.textContent);
-    for (const seg of segments) {
-      const txt = document.createTextNode(seg);
-      if (!appendNode(txt, page)) {
-        return false;
+    const text = node.textContent;
+
+    // 1) Prova frasi
+    const sentences = splitSentences(text);
+    if (sentences.length > 1) {
+      for (const sentence of sentences) {
+        const txtNode = document.createTextNode(sentence);
+        if (!appendNode(txtNode, page)) return false;
       }
+      return true;
+    }
+
+    // 2) Prova parole
+    const words = splitWords(text);
+    if (words.length > 1) {
+      for (const word of words) {
+        const txtNode = document.createTextNode(word);
+        if (!appendNode(txtNode, page)) return false;
+      }
+      return true;
+    }
+
+    // 3) Prova caratteri
+    const chars = splitChars(text);
+    for (const ch of chars) {
+      const txtNode = document.createTextNode(ch);
+      if (!appendNode(txtNode, page)) return false;
     }
     return true;
   }
 
+  // Se non è testo e non ci sta, ritorna false
   return false;
 }
 
