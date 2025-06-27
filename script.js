@@ -28,9 +28,9 @@ function computePageHeight() {
   return h;
 }
 
-const PAGE_HEIGHT = computePageHeight(); // Altezza totale del foglio
-const RESERVED_SPACE = 32;              // Spazio (px) lasciato vuoto in fondo
-const MAX_RECURSION_DEPTH = 10;         // Profondità massima per evitare loop infiniti
+const PAGE_HEIGHT = computePageHeight();            // Altezza totale del foglio
+const RESERVED_SPACE = Math.round(PAGE_HEIGHT * 0.05); // 5% di PAGE_HEIGHT
+const MAX_RECURSION_DEPTH = 10;                     // Profondità massima per evitare loop infiniti
 
 /**
  * Crea un nuovo blocco pagina vuoto e lo restituisce.
@@ -66,7 +66,7 @@ function isOverflowing(page) {
 
 /**
  * Funzione ricorsiva che prova ad aggiungere un nodo dentro una pagina.
- * Se il nodo supera l'altezza massima effettiva, prova a spezzarlo.
+ * Se il nodo supera l'altezza massima effettiva, prova a spezzarlo in nodi più piccoli.
  * Limita la profondità per evitare ricorsione infinita.
  */
 function tryAppendNode(node, page, depth = 0) {
@@ -100,7 +100,7 @@ function tryAppendNode(node, page, depth = 0) {
     return true;
   }
 
-  // Se è UL, gestiamo i <li> uno a uno, senza duplicazioni
+  // Se è UL, gestiamo i <li> uno a uno, evitando duplicazioni
   if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'UL') {
     const listItems = Array.from(node.children);
     let currentList = document.createElement('ul');
