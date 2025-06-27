@@ -20,14 +20,14 @@ function computePageHeight() {
   return h;
 }
 const PAGE_HEIGHT = computePageHeight();
-const SAFE_HEIGHT = PAGE_HEIGHT * 0.95; // lascia 5% di margine in basso
+const SAFE_HEIGHT = PAGE_HEIGHT * 0.95; // margine 5% in basso
 
 // Crea una pagina ma NON la appende subito
 function createPage() {
   const page = document.createElement("div");
   page.classList.add("page");
   page.style.boxSizing = "border-box";
-  page.style.paddingBottom = "1.5rem"; // margine inferiore per leggibilità
+  page.style.paddingBottom = "1.5rem"; // margine inferiore
   return page;
 }
 
@@ -65,9 +65,11 @@ function appendNode(node, page) {
 /**
  * Paginazione per liste UL:
  * Aggiunge LI uno per uno, spostando quelli che non ci stanno in pagine successive.
- * Nessuna duplicazione di LI.
+ * Ritorna array di pagine generate, nessuna duplicazione di LI.
  */
-function paginateList(ul, page, pages) {
+function paginateList(ul) {
+  const pages = [];
+  let page = createPage();
   let list = ul.cloneNode(false);
 
   for (const li of ul.children) {
@@ -77,13 +79,13 @@ function paginateList(ul, page, pages) {
     list.appendChild(liClone);
 
     if (page.scrollHeight > SAFE_HEIGHT) {
-      // Rimuovo l'ultimo li che fa traboccare
+      // Rimuovo li che fa traboccare
       list.removeChild(liClone);
 
-      // Salvo pagina corrente
+      // Salvo pagina piena
       pages.push(page);
 
-      // Creo nuova pagina e nuova lista, inserisco li rimosso
+      // Nuova pagina e nuova lista
       page = createPage();
       list = ul.cloneNode(false);
       list.appendChild(liClone);
@@ -91,7 +93,12 @@ function paginateList(ul, page, pages) {
     }
   }
 
-  return page;
+  // Spingo anche l'ultima pagina (che può essere parziale)
+  if (list.childNodes.length > 0 && !pages.includes(page)) {
+    pages.push(page);
+  }
+
+  return pages;
 }
 
 /**
@@ -105,7 +112,14 @@ function paginateHTML(html) {
 
   for (const child of Array.from(wrapper.childNodes)) {
     if (child.nodeType === Node.ELEMENT_NODE && child.tagName === "UL") {
-      page = paginateList(child, page, pages);
+      // paginateList ritorna array di pagine, le aggiungiamo tutte
+      const listPages = paginateList(child);
+      // prima aggiungiamo pagina corrente se ha contenuto
+      if (page.childNodes.length) pages.push(page);
+      // aggiungiamo tutte le pagine generate dalla lista
+      pages.push(...listPages);
+      // ripartiamo da pagina vuota
+      page = createPage();
     } else {
       if (!appendNode(child.cloneNode(true), page)) {
         pages.push(page);
@@ -114,6 +128,7 @@ function paginateHTML(html) {
       }
     }
   }
+
   if (page.childNodes.length) pages.push(page);
 
   for (const p of pages) {
