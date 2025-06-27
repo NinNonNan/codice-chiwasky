@@ -15,17 +15,17 @@ body {
   background: #f7f2e4 url('./images/paper-texture.jpg') repeat;
   font-family: 'HomemadeApple', cursive;
   color: #2e2b26;
-  line-height: 1.6;
+  line-height: 1.4;          /* leggermente ridotto da 1.6 */
   display: flex;
   justify-content: center;
 }
 
-/* Foglio tascabile A6 (aspect-ratio mantenuto via height e width calcolati) */
+/* Foglio tascabile A6 */
 .page {
   width: 100%;
-  max-width: 400px;                          /* massima larghezza “tascabile” */
-  height: calc(400px * 148 / 105);           /* altezza A6 esatta */
-  padding: 2rem 2rem 1rem;                   /* bottom padding riserva spazio */
+  max-width: 400px;
+  height: calc(400px * 148 / 105);
+  padding: 2rem 2rem 1rem;
   box-sizing: border-box;
   background-color: rgba(255,255,255,0.85);
   background-image:
@@ -36,34 +36,40 @@ body {
   border: 1px solid #ccc;
   position: relative;
   margin-bottom: 2rem;
-  overflow: hidden;    /* taglia, ma il JS sposta in pagina nuova */
+  overflow: hidden;
 }
 
-/* Titoli e paragrafi */
+/* Titoli e paragrafi: margini verticali ridotti per aumentare densità testo */
 h1 {
   font-size: 1.8rem;
-  margin-bottom: 1rem;
+  margin-top: 0.2rem;
+  margin-bottom: 0.6rem;   /* ridotto da 1rem */
   text-align: center;
   text-decoration: underline;
 }
+
 p {
-  margin: 0.8rem 0;
+  margin: 0.4rem 0;         /* ridotto da 0.8rem */
   text-indent: 1.5rem;
   white-space: pre-line;
+  line-height: 1.4;         /* coerente con body */
 }
 
-/* Liste */
+/* Liste con margini verticali ridotti */
 ul {
-  margin: 0.8rem 0 0.8rem 1.5rem;
+  margin: 0.4rem 0 0.6rem 1.5rem;  /* margine superiore ridotto, inferiore leggermente più piccolo */
+  padding-left: 0;
 }
+
 li {
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.3rem;    /* ridotto da 0.4rem */
+  line-height: 1.3;
 }
 
 /* Decorative smudge */
 .smudge {
   position: absolute;
-  bottom: 2rem;  /* rispetta il padding-bottom */
+  bottom: 2rem;
   left: 1.5rem;
   width: 60px;
   height: 30px;
