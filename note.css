@@ -26,6 +26,8 @@ body {
 /*
    Qui imponiamo un aspect-ratio A6 (105×148) combinato con width fissa o fluida,
    e aggiungiamo overflow:hidden per mantenere l'altezza costante.
+   Aggiungiamo anche height per farlo coincidere esattamente in pixel:
+   height = max-width × 148/105 ≈ 400px * 148/105 ≈ 564px
 */
 .page {
   background-color: rgba(255, 255, 255, 0.85); /* sfondo semi-trasparente carta */
@@ -35,19 +37,20 @@ body {
   background-size: 20px 20px; /* griglia a quadretti leggera */
 
   width: 100%;
-  max-width: 400px;         /* dimensione massima tascabile */
-  aspect-ratio: 105 / 148;  /* proporzioni esatte A6 */
+  max-width: 400px;                    /* dimensione massima tascabile */
+  aspect-ratio: 105 / 148;             /* proporzioni esatte A6 */
+  height: calc(400px * 148 / 105);     /* altezza A6 esatta in px */
 
   /* Impediamo che la pagina cresca in altezza oltre il suo form factor */
   overflow: hidden;
-  box-sizing: border-box;   /* include padding e bordi nelle dimensioni */
+  box-sizing: border-box;              /* include padding e bordi nelle dimensioni */
 
-  padding: 2rem;            /* spazio interno generoso */
-  margin-bottom: 2rem;      /* spazio tra i fogli */
+  padding: 2rem;                       /* spazio interno generoso */
+  margin-bottom: 2rem;                 /* spazio tra i fogli */
   box-shadow: 0 0 10px rgba(0,0,0,0.2); /* ombra delicata */
-  border: 1px solid #ccc;   /* bordo sottile */
+  border: 1px solid #ccc;              /* bordo sottile */
   position: relative;
-  overflow-wrap: break-word;/* evita overflow testo */
+  overflow-wrap: break-word;           /* evita overflow testo */
 }
 
 /* Titoli centrati con sottolineatura */
