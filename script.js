@@ -29,6 +29,16 @@ function createPage() {
 /**
  * Suddivide l'HTML generato dal Markdown in più pagine
  * in base all'altezza fissa predefinita.
+ * 
+ * L'algoritmo prova ad aggiungere un nodo alla pagina corrente;
+ * se la pagina supera l'altezza consentita, rimuove il nodo e crea
+ * una nuova pagina dove aggiungere il nodo.
+ * 
+ * Questo avviene nodo per nodo (elementi di primo livello),
+ * quindi blocchi di testo o immagini grandi vengono spostati interamente.
+ * 
+ * Nota: per suddivisioni più dettagliate (ad esempio dentro paragrafi lunghi)
+ * serve una logica più complessa di spezzamento del testo.
  */
 function paginateHTML(html) {
   const temp = document.createElement("div");
