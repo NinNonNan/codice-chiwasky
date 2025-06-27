@@ -1,102 +1,231 @@
-/* Definizione font personalizzato */
-@font-face {
-  font-family: 'HomemadeApple';
-  src: url('./fonts/HomemadeApple.woff2') format('woff2'),
-       url('./fonts/HomemadeApple.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+/**
+ * Scroll infinito per un blocco di appunti da Markdown.
+ * Ogni file è in `notes/` numerati 1.md, 2.md, …
+ * Usa ‘marked’ per convertire in HTML e poi spezza in pagine `.page`.
+ */
+
+let currentPage = 1;
+const container = document.getElementById("container");
+let loading = false;
+let hasMorePages = true;
+
+// Calcola altezza effettiva interna (clientHeight) di una .page, inclusi padding
+function computePageHeight() {
+  const tmp = document.createElement("div");
+  tmp.className = "page";
+  tmp.style.visibility = "hidden";
+  document.body.appendChild(tmp);
+  const h = tmp.clientHeight;
+  document.body.removeChild(tmp);
+  return h;
+}
+const PAGE_HEIGHT = computePageHeight();
+const SAFE_HEIGHT = PAGE_HEIGHT * 0.95; // margine 5% in basso
+
+// Crea una pagina ma NON la appende subito
+function createPage() {
+  const page = document.createElement("div");
+  page.classList.add("page");
+  page.style.boxSizing = "border-box";
+  page.style.paddingBottom = "0.1rem"; // ridotto padding-bottom per meno spazio
+  return page;
 }
 
-/* Stili base del body */
-body {
-  margin: 0;
-  padding: 1rem;              /* padding contenuto */
-  background: #f7f2e4 url('./images/paper-texture.jpg') repeat;
-  font-family: 'HomemadeApple', cursive;
-  color: #2e2b26;
-  line-height: 1.2;
-  display: flex;
-  justify-content: center;
+// Split helper: frasi
+function splitSentences(text) {
+  return text.match(/[^.!?]+[.!?]*\s*/g) || [text];
 }
 
-/* Foglio tascabile A6 */
-.page {
-  width: 100%;
-  max-width: 400px;
-  height: calc(400px * 148 / 105);
-  padding: 1.5rem 1.5rem 0.5rem;
-  box-sizing: border-box;
-  background-color: rgba(255,255,255,0.85);
-  background-image:
-    linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
-  background-size: 20px 20px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  border: 1px solid #ccc;
-  position: relative;
-  margin-bottom: 1rem;
-  overflow: hidden;
+// Split helper: parole
+function splitWords(text) {
+  return text.match(/\S+\s*/g) || [text];
 }
 
-/* Evita che singoli blocchi si spezzino a metà pagina */
-.page > * {
-  break-inside: avoid;
-  page-break-inside: avoid;
-  -webkit-column-break-inside: avoid;
+// Split helper: caratteri
+function splitChars(text) {
+  return text.split('');
 }
 
-/* Titoli e paragrafi: margini ridotti */
-h1 {
-  font-size: 1.8rem;
-  margin: 0 0 0.3rem 0;
-  text-align: center;
-  text-decoration: underline;
-  line-height: 1.1;
+/**
+ * Tenta di aggiungere node in page:
+ * - se ci sta, ritorna true
+ * - se non ci sta:
+ *    - se è testo, spezza in frasi, poi parole, poi caratteri
+ *    - se è elemento, prova a spezzare figli ricorsivamente
+ *    - altrimenti ritorna false
+ */
+function appendNode(node, page) {
+  page.appendChild(node);
+  if (page.scrollHeight <= SAFE_HEIGHT) return true;
+
+  page.removeChild(node);
+
+  if (node.nodeType === Node.TEXT_NODE) {
+    const text = node.textContent;
+
+    // 1) Prova frasi
+    const sentences = splitSentences(text);
+    if (sentences.length > 1) {
+      for (const sentence of sentences) {
+        const txtNode = document.createTextNode(sentence);
+        if (!appendNode(txtNode, page)) return false;
+      }
+      return true;
+    }
+
+    // 2) Prova parole
+    const words = splitWords(text);
+    if (words.length > 1) {
+      for (const word of words) {
+        const txtNode = document.createTextNode(word);
+        if (!appendNode(txtNode, page)) return false;
+      }
+      return true;
+    }
+
+    // 3) Prova caratteri
+    const chars = splitChars(text);
+    for (const ch of chars) {
+      const txtNode = document.createTextNode(ch);
+      if (!appendNode(txtNode, page)) return false;
+    }
+    return true;
+  }
+
+  if (node.nodeType === Node.ELEMENT_NODE) {
+    const children = Array.from(node.childNodes);
+    if (children.length === 0) {
+      // Elemento vuoto o non spezzabile
+      return false;
+    }
+
+    // Clona nodo senza figli
+    const clone = node.cloneNode(false);
+    page.appendChild(clone);
+
+    for (const child of children) {
+      if (!appendNode(child.cloneNode(true), clone)) {
+        page.removeChild(clone);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Se non è testo né elemento, ritorna false
+  return false;
 }
 
-p {
-  margin: 0.15rem 0;
-  text-indent: 1.2rem;
-  white-space: pre-line;
-  line-height: 1.2;
+/**
+ * Paginazione per liste UL:
+ * Aggiunge LI uno per uno, spostando quelli che non ci stanno in pagine successive.
+ * Ritorna array di pagine generate, nessuna duplicazione di LI.
+ */
+function paginateList(ul) {
+  const pages = [];
+  let page = createPage();
+  let list = ul.cloneNode(false);
+
+  for (const li of ul.children) {
+    const liClone = li.cloneNode(true);
+
+    if (!page.contains(list)) page.appendChild(list);
+    list.appendChild(liClone);
+
+    if (page.scrollHeight > SAFE_HEIGHT) {
+      // Rimuovo li che fa traboccare
+      list.removeChild(liClone);
+
+      // Salvo pagina piena
+      pages.push(page);
+
+      // Nuova pagina e nuova lista
+      page = createPage();
+      list = ul.cloneNode(false);
+      list.appendChild(liClone);
+      page.appendChild(list);
+    }
+  }
+
+  // Spingo anche l'ultima pagina (che può essere parziale)
+  if (list.childNodes.length > 0 && !pages.includes(page)) {
+    pages.push(page);
+  }
+
+  return pages;
 }
 
-/* Liste con margini e padding stretti */
-ul {
-  margin: 0.25rem 0 0.25rem 1.2rem;
-  padding-left: 0;
+/**
+ * Converte l'HTML Markdown in pagine `.page`, appendendole.
+ */
+function paginateHTML(html) {
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = html;
+  const pages = [];
+  let page = createPage();
+
+  for (const child of Array.from(wrapper.childNodes)) {
+    if (child.nodeType === Node.ELEMENT_NODE && child.tagName === "UL") {
+      // paginateList ritorna array di pagine, le aggiungiamo tutte
+      const listPages = paginateList(child);
+      // prima aggiungiamo pagina corrente se ha contenuto
+      if (page.childNodes.length) pages.push(page);
+      // aggiungiamo tutte le pagine generate dalla lista
+      pages.push(...listPages);
+      // ripartiamo da pagina vuota
+      page = createPage();
+    } else {
+      if (!appendNode(child.cloneNode(true), page)) {
+        pages.push(page);
+        page = createPage();
+        appendNode(child.cloneNode(true), page);
+      }
+    }
+  }
+
+  if (page.childNodes.length) pages.push(page);
+
+  for (const p of pages) {
+    container.appendChild(p);
+  }
 }
 
-li {
-  margin-bottom: 0.12rem;
-  line-height: 1.15;
+/**
+ * Carica e paginizza il prossimo file Markdown.
+ */
+async function loadNextPage() {
+  if (loading || !hasMorePages) return;
+  loading = true;
+  try {
+    const res = await fetch(`notes/${currentPage}.md`);
+    if (!res.ok) {
+      hasMorePages = false;
+      return;
+    }
+    const md = await res.text();
+    const html = marked.parse(md);
+    paginateHTML(html);
+    currentPage++;
+  } catch (e) {
+    console.error(e);
+    hasMorePages = false;
+  } finally {
+    loading = false;
+  }
 }
 
-/* Riduzione ulteriore spazi fra blocchi */
-h1 + p,
-h1 + ul,
-p + p,
-p + ul,
-ul + p,
-ul + ul {
-  margin-top: 0.15rem;
+/**
+ * Precarica finché non compare lo scroll.
+ */
+async function preload() {
+  while (document.body.scrollHeight <= window.innerHeight && hasMorePages) {
+    await loadNextPage();
+  }
 }
 
-/* Decorative smudge */
-.smudge {
-  position: absolute;
-  bottom: 1.5rem;
-  left: 1rem;
-  width: 60px;
-  height: 30px;
-  background: url('./images/ink-smudge.png') no-repeat center/contain;
-  opacity: 0.2;
-}
-
-/* Rimuoviamo elementi non più necessari */
-.cutoff,
-.artifact-line,
-.page::before {
-  display: none;
-}
+window.addEventListener("DOMContentLoaded", preload);
+window.addEventListener("scroll", () => {
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
+    loadNextPage();
+  }
+});
