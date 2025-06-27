@@ -1,66 +1,93 @@
 body {
-  background-color: #d4c6a4;
+  background-color: #a08f74;
   margin: 0;
   padding: 2rem;
-  font-family: 'Special Elite', monospace;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-}
-
-.notebook {
-  display: flex;
-  flex-direction: row;
-  background: #fdf6e3;
-  box-shadow: 0 0 20px rgba(0,0,0,0.3);
-  border: 2px solid #333;
-  border-radius: 6px;
-  padding: 1rem;
-  gap: 2rem;
-  transform: rotate(-1deg);
-}
-
-.page {
-  width: 300px;
-  height: 400px;
-  background: linear-gradient(to bottom, #fdf6e3 0%, #f5ebd3 100%);
-  padding: 1.5rem;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
-  border: 1px dashed #555;
-  border-radius: 4px;
+  font-family: 'Waiting for the Sunrise', cursive;
   position: relative;
 }
 
-.page::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -10px;
-  width: 10px;
-  height: 100%;
-  background: repeating-linear-gradient(
-    to bottom,
-    #aaa,
-    #aaa 2px,
-    transparent 2px,
-    transparent 4px
-  );
+.page {
+  width: 400px;
+  height: 550px;
+  background: #f9f0dd;
+  border: 1px solid #333;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transform: rotate(-1.5deg);
 }
 
-.page h1, .page h2 {
+.paper-texture {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://i.imgur.com/qjYwXze.png'); /* texture carta stropicciata */
+  background-size: cover;
+  opacity: 0.2;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #222;
+}
+
+h1 {
+  font-size: 1.4rem;
   margin-top: 0;
-  text-transform: uppercase;
-  font-size: 1.2rem;
-  border-bottom: 1px solid #444;
+  border-bottom: 1px dashed #444;
   padding-bottom: 0.3rem;
 }
 
-.page p, .page li {
-  font-size: 0.95rem;
-  line-height: 1.5;
+.smudge {
+  position: relative;
+  display: inline-block;
+}
+.smudge::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 0.4em;
+  background: rgba(0, 0, 0, 0.1);
+  transform: rotate(-8deg);
 }
 
-ul {
-  padding-left: 1.2rem;
+.glitch {
+  display: inline-block;
+  position: relative;
+}
+.glitch::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0.1em;
+  width: 100%;
+  height: 1px;
+  background: #222;
+  transform: rotate(2deg);
+}
+
+.tear {
+  display: inline-block;
+  position: relative;
+}
+.tear::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 10px;
+  height: 100%;
+  background: linear-gradient(to bottom right, transparent 50%, #f9f0dd 50%);
+  transform: rotate(5deg);
 }
