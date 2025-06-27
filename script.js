@@ -3,14 +3,14 @@ const container = document.getElementById("container");
 let loading = false;
 
 async function loadNextPage() {
-  if (loading) return;
+  if (loading) return false;
   loading = true;
 
   try {
     const response = await fetch(`notes/${currentPage}.md`);
     if (!response.ok) {
       loading = false;
-      return; // Nessun altro file trovato
+      return false;  // file non trovato, stop
     }
 
     const markdown = await response.text();
@@ -23,18 +23,27 @@ async function loadNextPage() {
     container.appendChild(page);
     currentPage++;
     loading = false;
+    return true;
   } catch (e) {
-    console.error("Errore nel caricamento:", e);
+    console.error("Errore durante il caricamento:", e);
     loading = false;
+    return false;
   }
 }
+
+async function preloadUntilScrollable() {
+  while (document.body.scrollHeight <= window.innerHeight) {
+    const success = await loadNextPage();
+    if (!success) break; // esci se non ci sono più pagine
+  }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  preloadUntilScrollable();
+});
 
 window.addEventListener("scroll", () => {
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
     loadNextPage();
   }
-});
-
-window.addEventListener("DOMContentLoaded", () => {
-  loadNextPage(); // carica la prima pagina
 });
