@@ -27,18 +27,18 @@ function createPage() {
 }
 
 /**
+ * Funzione helper per spezzare un nodo di testo in frasi
+ * (divide per punto seguito da spazio, mantenendo la punteggiatura).
+ */
+function splitTextIntoSentences(text) {
+  // Usa una regex semplice per dividere per punti + spazio/newline
+  return text.match(/[^.!?]+[.!?]*\s*/g) || [text];
+}
+
+/**
  * Suddivide l'HTML generato dal Markdown in più pagine
  * in base all'altezza fissa predefinita.
- * 
- * L'algoritmo prova ad aggiungere un nodo alla pagina corrente;
- * se la pagina supera l'altezza consentita, rimuove il nodo e crea
- * una nuova pagina dove aggiungere il nodo.
- * 
- * Questo avviene nodo per nodo (elementi di primo livello),
- * quindi blocchi di testo o immagini grandi vengono spostati interamente.
- * 
- * Nota: per suddivisioni più dettagliate (ad esempio dentro paragrafi lunghi)
- * serve una logica più complessa di spezzamento del testo.
+ * Spezza testi troppo lunghi per evitare tagli.
  */
 function paginateHTML(html) {
   const temp = document.createElement("div");
@@ -48,15 +48,33 @@ function paginateHTML(html) {
   container.appendChild(current);
 
   for (const node of Array.from(temp.childNodes)) {
-    current.appendChild(node);
+    // Se il nodo è un testo lungo, spezzalo in frasi
+    if (node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0) {
+      const sentences = splitTextIntoSentences(node.textContent);
+      for (const sentence of sentences) {
+        const span = document.createElement("span");
+        span.textContent = sentence;
 
-    // Se il contenuto supera l’altezza della pagina, crea una nuova pagina
-    if (current.scrollHeight > PAGE_HEIGHT) {
-      current.removeChild(node); // rimuovi dall'attuale
+        current.appendChild(span);
+        if (current.scrollHeight > PAGE_HEIGHT) {
+          current.removeChild(span);
+          current = createPage();
+          container.appendChild(current);
+          current.appendChild(span);
+        }
+      }
+    }
+    else {
+      // Nodo elemento: aggiungi intero nodo
+      current.appendChild(node);
 
-      current = createPage();
-      container.appendChild(current);
-      current.appendChild(node); // aggiungi alla nuova
+      // Se supera altezza, sposta il nodo in una nuova pagina
+      if (current.scrollHeight > PAGE_HEIGHT) {
+        current.removeChild(node);
+        current = createPage();
+        container.appendChild(current);
+        current.appendChild(node);
+      }
     }
   }
 }
