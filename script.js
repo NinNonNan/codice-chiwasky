@@ -23,6 +23,8 @@ function createPage() {
   const page = document.createElement("div");
   page.classList.add("page");
   page.style.marginBottom = "4rem"; // Spazio tra le pagine
+  page.style.boxSizing = "border-box"; // Assicuro box-sizing coerente
+  page.style.minHeight = PAGE_HEIGHT + "px"; // Imposto altezza minima pagina per evitare layout strani
   return page;
 }
 
@@ -66,6 +68,11 @@ function tryAppendNode(node, page) {
     } else if (node.nodeType === Node.ELEMENT_NODE) {
       // Nodo elemento con figli: prova a spezzare figli
       const children = Array.from(node.childNodes);
+      if (children.length === 0) {
+        // Elemento senza figli ma troppo grande, non si può spezzare => fallisce
+        return false;
+      }
+
       const clone = node.cloneNode(false); // clone senza figli
       page.appendChild(clone);
 
@@ -101,10 +108,13 @@ function paginateHTML(html) {
       // Nodo non inserito => creo nuova pagina e riprovo
       current = createPage();
       container.appendChild(current);
+
       const success = tryAppendNode(node.cloneNode(true), current);
-      // Se neanche nella pagina nuova va, lo spezzamento è stato fatto ricorsivamente in tryAppendNode
       if (!success) {
-        console.warn("Non è stato possibile inserire il nodo, anche spezzandolo", node);
+        // Se neanche nella pagina nuova va, il nodo è troppo grande anche spezzando
+        // Lo aggiungo comunque forzatamente (per evitare perdita contenuti)
+        current.appendChild(node.cloneNode(true));
+        console.warn("Nodo troppo grande, inserito forzatamente senza spezzatura:", node);
       }
     }
   }
@@ -122,7 +132,9 @@ async function loadNextPage() {
     const response = await fetch(`notes/${currentPage}.md`);
 
     if (!response.ok) {
+      // File non trovato => non ci sono più pagine da caricare
       hasMorePages = false;
+      loading = false;
       return false;
     }
 
@@ -132,15 +144,14 @@ async function loadNextPage() {
     paginateHTML(html);
 
     currentPage++;
+    loading = false;
     return true;
 
   } catch (e) {
     console.error(`Errore durante il caricamento della pagina ${currentPage}:`, e);
     hasMorePages = false;
-    return false;
-
-  } finally {
     loading = false;
+    return false;
   }
 }
 
@@ -160,7 +171,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 window.addEventListener("scroll", () => {
-  if (!loading && window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
     loadNextPage();
   }
 });
