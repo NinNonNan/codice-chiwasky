@@ -1,72 +1,40 @@
 let currentPage = 1;
+const container = document.getElementById("container");
 let loading = false;
 
-// Funzione per caricare un file markdown
-async function loadMarkdownPage(pageNumber) {
-  try {
-    const response = await fetch(`./notes/${pageNumber}.md`);
-    if (!response.ok) return false; // Fine se il file non esiste
-
-    const text = await response.text();
-    const html = markdownToHtml(text);
-    appendPage(html);
-    return true;
-  } catch (e) {
-    console.error(e);
-    return false;
-  }
-}
-
-// Conversione markdown minima
-function markdownToHtml(markdown) {
-  // Supporto semplice per titoli e paragrafi
-  return markdown
-    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-    .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/gim, '<em>$1</em>')
-    .replace(/\n$/gim, '<br>')
-    .replace(/\n/g, '<br>');
-}
-
-// Crea un blocco .page
-function appendPage(content) {
-  const container = document.getElementById('notebook');
-  const page = document.createElement('div');
-  page.className = 'page';
-  page.innerHTML = content;
-
-  // Smudge casuale
-  if (Math.random() < 0.5) {
-    const smudge = document.createElement('div');
-    smudge.className = 'smudge';
-    smudge.style.left = `${Math.random() * 60 + 10}%`;
-    smudge.style.bottom = `${Math.random() * 40 + 5}%`;
-    page.appendChild(smudge);
-  }
-
-  container.appendChild(page);
-}
-
-// Scroll infinito
-async function handleScroll() {
+async function loadNextPage() {
   if (loading) return;
+  loading = true;
 
-  const scrollY = window.scrollY + window.innerHeight;
-  const threshold = document.body.offsetHeight - 300;
-
-  if (scrollY >= threshold) {
-    loading = true;
-    const loaded = await loadMarkdownPage(currentPage++);
-    loading = false;
-
-    if (!loaded) {
-      window.removeEventListener('scroll', handleScroll);
+  try {
+    const response = await fetch(`notes/${currentPage}.md`);
+    if (!response.ok) {
+      loading = false;
+      return; // Nessun altro file trovato
     }
+
+    const markdown = await response.text();
+    const html = marked.parse(markdown);
+
+    const page = document.createElement("div");
+    page.classList.add("page");
+    page.innerHTML = html;
+
+    container.appendChild(page);
+    currentPage++;
+    loading = false;
+  } catch (e) {
+    console.error("Errore nel caricamento:", e);
+    loading = false;
   }
 }
 
-// Avvio
-loadMarkdownPage(currentPage++);
-window.addEventListener('scroll', handleScroll);
+window.addEventListener("scroll", () => {
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
+    loadNextPage();
+  }
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadNextPage(); // carica la prima pagina
+});
