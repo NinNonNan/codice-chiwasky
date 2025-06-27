@@ -56,8 +56,8 @@ function tryAppendNode(node, page) {
       // Nodo testo troppo lungo: spezza in segmenti e prova uno per uno
       const segments = splitTextIntoSegments(node.textContent);
       for (const segment of segments) {
-        const span = document.createTextNode(segment);
-        if (!tryAppendNode(span, page)) {
+        const textNode = document.createTextNode(segment);
+        if (!tryAppendNode(textNode, page)) {
           // Nodo non inserito => serve nuova pagina
           return false;
         }
@@ -123,7 +123,6 @@ async function loadNextPage() {
 
     if (!response.ok) {
       hasMorePages = false;
-      loading = false;
       return false;
     }
 
@@ -133,14 +132,15 @@ async function loadNextPage() {
     paginateHTML(html);
 
     currentPage++;
-    loading = false;
     return true;
 
   } catch (e) {
     console.error(`Errore durante il caricamento della pagina ${currentPage}:`, e);
     hasMorePages = false;
-    loading = false;
     return false;
+
+  } finally {
+    loading = false;
   }
 }
 
@@ -160,7 +160,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 window.addEventListener("scroll", () => {
-  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
+  if (!loading && window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
     loadNextPage();
   }
 });
