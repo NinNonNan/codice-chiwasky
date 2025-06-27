@@ -9,7 +9,7 @@ const container = document.getElementById("container");
 let loading = false;
 let hasMorePages = true;
 
-// Altezza effettiva interna (clientHeight) di una .page, inclusi padding
+// Calcola altezza effettiva interna (clientHeight) di una .page, inclusi padding
 function computePageHeight() {
   const tmp = document.createElement("div");
   tmp.className = "page";
@@ -20,28 +20,32 @@ function computePageHeight() {
   return h;
 }
 const PAGE_HEIGHT = computePageHeight();
-const MAX_TEXT_SEGMENT = 100;   // lunghezza massima segmenti di testo
+const SAFE_HEIGHT = PAGE_HEIGHT * 0.95; // lascia 5% di margine in basso
 
 // Crea una pagina ma NON la appende subito
 function createPage() {
-  return document.createElement("div");
+  const page = document.createElement("div");
+  page.classList.add("page");
+  page.style.boxSizing = "border-box";
+  page.style.paddingBottom = "1.5rem"; // margine inferiore per leggibilità
+  return page;
 }
 
-// Spezza testo in segmenti più piccoli, per evitare overflow di un paragrafo lungo
+// Spezza testo in segmenti più piccoli (frasi)
 function splitText(text) {
   return text.match(/[^.!?]+[.!?]*\s*/g) || [text];
 }
 
 /**
- * Tenta di appendere node in page:
- * - Se ci sta, ritorna true.
- * - Se trabocca:
- *    - se è testo: spezza in frasi e le riprova una a una
- *    - altrimenti: ritorna false (deve andare su pagina nuova)
+ * Tenta di aggiungere node in page:
+ * - se ci sta, ritorna true
+ * - se non ci sta:
+ *    - se è testo, spezza e prova segmento per segmento
+ *    - altrimenti ritorna false
  */
 function appendNode(node, page) {
   page.appendChild(node);
-  if (page.scrollHeight <= PAGE_HEIGHT) return true;
+  if (page.scrollHeight <= SAFE_HEIGHT) return true;
   page.removeChild(node);
 
   if (node.nodeType === Node.TEXT_NODE) {
@@ -49,7 +53,7 @@ function appendNode(node, page) {
     for (const seg of segments) {
       const txt = document.createTextNode(seg);
       if (!appendNode(txt, page)) {
-        return false; // il resto va su pagina nuova
+        return false;
       }
     }
     return true;
@@ -59,29 +63,39 @@ function appendNode(node, page) {
 }
 
 /**
- * Data una lista UL, aggiunge i LI uno a uno, spostando ciascuno se non ci sta.
+ * Paginazione per liste UL:
+ * Aggiunge LI uno per uno, spostando quelli che non ci stanno in pagine successive.
+ * Nessuna duplicazione di LI.
  */
 function paginateList(ul, page, pages) {
   let list = ul.cloneNode(false);
+
   for (const li of ul.children) {
-    const item = li.cloneNode(true);
+    const liClone = li.cloneNode(true);
+
     if (!page.contains(list)) page.appendChild(list);
-    list.appendChild(item);
-    if (page.scrollHeight > PAGE_HEIGHT) {
-      list.removeChild(item);
-      // salva pagina corrente
+    list.appendChild(liClone);
+
+    if (page.scrollHeight > SAFE_HEIGHT) {
+      // Rimuovo l'ultimo li che fa traboccare
+      list.removeChild(liClone);
+
+      // Salvo pagina corrente
       pages.push(page);
-      // nuova pagina e nuova lista
+
+      // Creo nuova pagina e nuova lista, inserisco li rimosso
       page = createPage();
       list = ul.cloneNode(false);
-      list.appendChild(item);
+      list.appendChild(liClone);
+      page.appendChild(list);
     }
   }
-  return { page, listAppended: !!list.childNodes.length };
+
+  return page;
 }
 
 /**
- * Converte l'HTML di un Markdown in pagine `.page`, appendendole.
+ * Converte l'HTML Markdown in pagine `.page`, appendendole.
  */
 function paginateHTML(html) {
   const wrapper = document.createElement("div");
@@ -91,9 +105,7 @@ function paginateHTML(html) {
 
   for (const child of Array.from(wrapper.childNodes)) {
     if (child.nodeType === Node.ELEMENT_NODE && child.tagName === "UL") {
-      const result = paginateList(child, page, pages);
-      if (result.listAppended) pages.push(page);
-      page = createPage();
+      page = paginateList(child, page, pages);
     } else {
       if (!appendNode(child.cloneNode(true), page)) {
         pages.push(page);
@@ -104,9 +116,7 @@ function paginateHTML(html) {
   }
   if (page.childNodes.length) pages.push(page);
 
-  // append finali
   for (const p of pages) {
-    p.classList.add("page");
     container.appendChild(p);
   }
 }
@@ -119,7 +129,10 @@ async function loadNextPage() {
   loading = true;
   try {
     const res = await fetch(`notes/${currentPage}.md`);
-    if (!res.ok) { hasMorePages = false; return; }
+    if (!res.ok) {
+      hasMorePages = false;
+      return;
+    }
     const md = await res.text();
     const html = marked.parse(md);
     paginateHTML(html);
