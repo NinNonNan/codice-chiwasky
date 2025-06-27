@@ -103,7 +103,6 @@ function appendNode(node, page) {
     const clone = node.cloneNode(false);
     page.appendChild(clone);
 
-    // Prova ad aggiungere i figli uno per uno
     for (const child of children) {
       if (!appendNode(child.cloneNode(true), clone)) {
         page.removeChild(clone);
