@@ -14,19 +14,18 @@ body {
   padding: 2rem; /* padding per non attaccarsi ai bordi */
   background: #f7f2e4 url('./images/paper-texture.jpg') repeat;
   font-family: 'HomemadeApple', cursive;
-  font-size: 1.1rem;
   color: #2e2b26;
-  line-height: 1.8;
+  line-height: 1.6;
 
   /* Centriamo il contenuto orizzontalmente */
   display: flex;
   justify-content: center;
 }
 
-/* Stile delle pagine (blocchi di appunti tascabili) */
+/* Stile dei fogli tascabili (A6-like) */
 /*
-   Manteniamo il form factor A6 tramite aspect-ratio,
-   in modo che si adatti al tuo layout web responsive.
+   Qui imponiamo un aspect-ratio A6 (105×148) combinato con width fissa o fluida,
+   e aggiungiamo overflow:hidden per mantenere l'altezza costante.
 */
 .page {
   background-color: rgba(255, 255, 255, 0.85); /* sfondo semi-trasparente carta */
@@ -35,22 +34,23 @@ body {
     linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
   background-size: 20px 20px; /* griglia a quadretti leggera */
 
-  width: 100%;            /* prendiamo tutta la larghezza disponibile */
-  max-width: 400px;       /* massimo circa tascabile */
-  aspect-ratio: 105 / 148; /* proporzioni per A6 */
+  width: 100%;
+  max-width: 400px;         /* dimensione massima tascabile */
+  aspect-ratio: 105 / 148;  /* proporzioni esatte A6 */
 
-  padding: 2rem;          /* spazio interno generoso */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* ombra delicata */
-  border: 1px solid #ccc; /* bordo sottile */
-  box-sizing: border-box; /* include padding e bordi nelle dimensioni */
+  /* Impediamo che la pagina cresca in altezza oltre il suo form factor */
+  overflow: hidden;
+  box-sizing: border-box;   /* include padding e bordi nelle dimensioni */
 
+  padding: 2rem;            /* spazio interno generoso */
+  margin-bottom: 2rem;      /* spazio tra i fogli */
+  box-shadow: 0 0 10px rgba(0,0,0,0.2); /* ombra delicata */
+  border: 1px solid #ccc;   /* bordo sottile */
   position: relative;
-  overflow: hidden;       /* niente scroll interno */
-  margin-bottom: 2rem;    /* spazio tra pagine */
-  overflow-wrap: break-word; /* evita overflow testo */
+  overflow-wrap: break-word;/* evita overflow testo */
 }
 
-/* Titoli h1 centrati con sottolineatura */
+/* Titoli centrati con sottolineatura */
 h1 {
   font-size: 1.8rem;
   margin-bottom: 1rem;
@@ -76,7 +76,7 @@ p {
   opacity: 0.2;
 }
 
-/* Rimuoviamo le classi non più utilizzate */
+/* Rimuoviamo le classi non più necessarie */
 .cutoff,
 .artifact-line,
 .page::before {
