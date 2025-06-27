@@ -1,107 +1,80 @@
+@font-face {
+  font-family: 'StrokifyLight';
+  src: url('./fonts/StrokifyLight.woff2') format('woff2'),
+       url('./fonts/StrokifyLight.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
-  background-color: #b3a58d;
   margin: 0;
+  padding: 0;
+  background: #f7f2e4 url('./images/paper-texture.jpg') repeat;
+  font-family: 'StrokifyLight', cursive;
+  font-size: 1.1rem;
+  color: #2e2b26;
+  line-height: 1.8;
   padding: 2rem;
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  font-family: 'Homemade Apple', cursive;
 }
 
 .page {
-  width: 420px;
-  height: 580px;
-  background: #f5eedc;
-  border: 2px solid #444;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4), inset 0 0 8px rgba(0, 0, 0, 0.2);
-  padding: 2.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  width: 600px;
+  min-height: 800px;
+  padding: 3rem 2rem;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  border: 1px solid #ccc;
   position: relative;
+  box-sizing: border-box;
   overflow: hidden;
-  transform: rotate(-1deg);
 }
 
-.paper-texture {
+.page::before {
+  content: "";
   position: absolute;
-  inset: 0;
-  background-image: url('https://i.imgur.com/qjYwXze.png'); /* carta stropicciata */
-  background-size: cover;
-  opacity: 0.25;
-  pointer-events: none;
-  z-index: 0;
-  mix-blend-mode: multiply;
-}
-
-.content {
-  position: relative;
-  z-index: 1;
-  font-size: 1.1rem;
-  line-height: 1.8;
-  color: #2a2a2a;
+  top: 0;
+  bottom: 0;
+  left: 3rem;
+  width: 2px;
+  background-color: rgba(100, 0, 0, 0.2);
 }
 
 h1 {
-  font-size: 1.5rem;
-  margin: 0 0 0.8rem 0;
-  border-bottom: 1px dashed #666;
-  padding-bottom: 0.4rem;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  text-decoration: underline;
 }
 
-.smudge::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: 0.2em;
-  width: 100%;
-  height: 0.3em;
-  background: rgba(60, 30, 10, 0.15);
-  transform: rotate(-6deg);
-  pointer-events: none;
+p {
+  margin: 1rem 0;
+  text-indent: 2rem;
+  white-space: pre-line;
 }
 
 .smudge {
-  position: relative;
-  display: inline-block;
-}
-
-.glitch::after {
-  content: '';
   position: absolute;
-  bottom: 0.1em;
-  left: 0;
+  bottom: 10%;
+  left: 15%;
+  width: 80px;
+  height: 40px;
+  background: url('./images/ink-smudge.png') no-repeat center/contain;
+  opacity: 0.2;
+}
+
+.cutoff {
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 85%;
+}
+
+.artifact-line {
   width: 100%;
-  height: 1px;
-  background: #111;
-  transform: rotate(2deg);
-}
-
-.glitch {
-  position: relative;
-  display: inline-block;
-}
-
-.tear::after {
-  content: '...';
-  color: #999;
-  font-weight: bold;
-  margin-left: 2px;
-}
-
-.tear {
-  position: relative;
-  display: inline-block;
-}
-
-.blur {
-  filter: blur(1.5px);
-}
-
-.strike {
-  text-decoration: line-through;
-  opacity: 0.7;
-}
-
-.bottom-note {
-  margin-top: 2rem;
-  font-size: 1rem;
+  height: 2px;
+  background: rgba(0,0,0,0.1);
+  margin: 1rem 0;
 }
