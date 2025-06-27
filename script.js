@@ -28,19 +28,19 @@ function computePageHeight() {
   return h;
 }
 
-const PAGE_HEIGHT = computePageHeight();   // Altezza totale del foglio (CSS driven)
-const RESERVED_PERCENT = 0.02;             // 2% di spazio riservato in fondo
-const MAX_RECURSION_DEPTH = 10;            // Profondità massima per evitare loop infiniti
+const PAGE_HEIGHT = computePageHeight(); // Altezza totale del foglio (CSS-driven)
+const RESERVED_PERCENT = 0.02;           // 2% di spazio riservato in fondo
+const MAX_RECURSION_DEPTH = 10;          // Profondità massima di ricorsione per evitare loop infiniti
 
 /**
  * Calcola lo spazio riservato in px, in base all'altezza effettiva di ciascun foglio.
  */
-function computeReservedSpace(page) {
-  return Math.round(page.offsetHeight * RESERVED_PERCENT);
+function computeReservedSpace(pageHeight) {
+  return Math.round(pageHeight * RESERVED_PERCENT);
 }
 
 /**
- * Crea un nuovo blocco pagina vuoto e lo restituisce.
+ * Crea un nuovo blocco pagina vuoto (MA non lo appende subito).
  */
 function createPage() {
   const page = document.createElement("div");
@@ -68,34 +68,43 @@ function splitTextToChunks(text, maxLength = 100) {
  * la parte utilizzabile (escludendo lo spazio riservato).
  */
 function isOverflowing(page) {
-  const reserved = computeReservedSpace(page);
-  return page.scrollHeight > (page.offsetHeight - reserved);
+  const reserved = computeReservedSpace(page.clientHeight);
+  return page.scrollHeight > (page.clientHeight - reserved);
 }
 
 /**
  * Funzione ricorsiva che prova ad aggiungere un nodo dentro una pagina.
  * Se il nodo supera l'altezza massima effettiva, prova a spezzarlo in nodi più piccoli.
  * Limita la profondità per evitare ricorsione infinita.
+ *
+ * Ritorna:
+ * - true se il nodo (o i suoi pezzi) è stato inserito in questa pagina
+ * - false se NON ci stava e deve andare in una pagina nuova
  */
 function tryAppendNode(node, page, depth = 0) {
   if (depth > MAX_RECURSION_DEPTH) return false;
   page.appendChild(node);
   if (!isOverflowing(page)) return true;
+
+  // Se trabocca, lo rimuovo e provo a spezzare
   page.removeChild(node);
 
   if (node.nodeType === Node.TEXT_NODE) {
+    // Se troppo piccolo non spezzare
     if (node.textContent.length <= 20) return false;
+    // Spezza in chunk
     const chunks = splitTextToChunks(node.textContent, 50);
     for (let i = 0; i < chunks.length; i++) {
-      const txtNode = document.createTextNode(chunks[i]);
-      if (!tryAppendNode(txtNode, page, depth + 1)) {
-        return false; // il resto verrà gestito sulla pagina successiva
+      const txt = document.createTextNode(chunks[i]);
+      if (!tryAppendNode(txt, page, depth + 1)) {
+        return false; // resto va su pagina nuova
       }
     }
     return true;
-  } 
-  else if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'UL') {
-    // Elementi non-UL: spezza i figli
+  }
+
+  if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'UL') {
+    // Elementi generici: spezza figli
     const children = Array.from(node.childNodes);
     const clone = node.cloneNode(false);
     page.appendChild(clone);
@@ -108,59 +117,84 @@ function tryAppendNode(node, page, depth = 0) {
     return true;
   }
 
-  // Se è UL, gestiamo i <li> uno a uno, evitando duplicazioni
+  // Gestione UL: un solo ciclo, senza duplicazioni
   if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'UL') {
-    const listItems = Array.from(node.children);
-    let currentList = document.createElement('ul');
-    currentList.className = node.className;
-    page.appendChild(currentList);
+    const items = Array.from(node.children);
+    let list = document.createElement('ul');
+    list.className = node.className;
 
-    for (const li of listItems) {
+    for (const li of items) {
       const liClone = li.cloneNode(true);
-      currentList.appendChild(liClone);
 
-      // Se trabocca, rimuovo liClone e sposto su nuova pagina
+      // Provo ad aggiungere il <ul> se non l'ho già fatto
+      if (!page.contains(list)) {
+        page.appendChild(list);
+      }
+      list.appendChild(liClone);
+
       if (isOverflowing(page)) {
-        currentList.removeChild(liClone);
+        // Rimuovo questo <li> dalla lista corrente
+        list.removeChild(liClone);
+
+        // Se la lista è vuota adesso, non appendere una pagina vuota
+        if (list.childNodes.length === 0) {
+          // non fare nulla
+        } else {
+          // appendi la pagina piena
+          container.appendChild(page);
+        }
 
         // Nuova pagina
         page = createPage();
-        container.appendChild(page);
 
         // Nuova lista
-        currentList = document.createElement('ul');
-        currentList.className = node.className;
-        page.appendChild(currentList);
-
-        // Inserisco liClone nella nuova lista
-        currentList.appendChild(liClone);
+        list = document.createElement('ul');
+        list.className = node.className;
+        list.appendChild(liClone);
       }
+    }
+
+    // Alla fine, se la lista contiene elementi, appendi la pagina
+    if (list.childNodes.length > 0) {
+      page.appendChild(list);
     }
     return true;
   }
 
-  return false; // altri nodi non gestiti
+  return false;
 }
 
 /**
  * Suddivide l'HTML generato dal Markdown in più pagine
- * in base all'altezza fissa effettiva.
+ * in base all'altezza fissa effettiva e appende solo pagine non vuote.
  */
 function paginateHTML(html) {
   const temp = document.createElement("div");
   temp.innerHTML = html;
 
+  const pages = [];
   let current = createPage();
-  container.appendChild(current);
 
-  for (const origNode of Array.from(temp.childNodes)) {
-    const node = origNode.cloneNode(true);
+  for (const orig of Array.from(temp.childNodes)) {
+    const node = orig.cloneNode(true);
+    // Se non ci sta, salva la pagina attuale e crea una nuova
     if (!tryAppendNode(node, current)) {
-      // Nodo non inserito => nuova pagina e reinserimento
+      if (current.childNodes.length) {
+        pages.push(current);
+      }
       current = createPage();
-      container.appendChild(current);
+      // Riprovo a inserire qui
       tryAppendNode(node, current);
     }
+  }
+  // Append ultima pagina se non vuota
+  if (current.childNodes.length) {
+    pages.push(current);
+  }
+
+  // Infine, append tutte le pagine
+  for (const pg of pages) {
+    container.appendChild(pg);
   }
 }
 
@@ -176,23 +210,19 @@ async function loadNextPage() {
     const res = await fetch(`notes/${currentPage}.md`);
     if (!res.ok) {
       hasMorePages = false;
-      loading = false;
       return false;
     }
-
     const md = await res.text();
     const html = marked.parse(md);
     paginateHTML(html);
-
     currentPage++;
-    loading = false;
     return true;
-
   } catch (e) {
     console.error(`Errore caricamento pagina ${currentPage}:`, e);
     hasMorePages = false;
-    loading = false;
     return false;
+  } finally {
+    loading = false;
   }
 }
 
@@ -206,10 +236,7 @@ async function preloadUntilScrollable() {
   }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  preloadUntilScrollable();
-});
-
+window.addEventListener("DOMContentLoaded", () => preloadUntilScrollable());
 window.addEventListener("scroll", () => {
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
     loadNextPage();
