@@ -14,6 +14,10 @@ function computePageHeight() {
   const tmp = document.createElement("div");
   tmp.className = "page";
   tmp.style.visibility = "hidden";
+  tmp.style.position = "absolute";
+  tmp.style.top = "0";
+  tmp.style.left = "0";
+  tmp.style.width = "100%";
   document.body.appendChild(tmp);
   const h = tmp.clientHeight;
   document.body.removeChild(tmp);
