@@ -1,7 +1,7 @@
 @font-face {
   font-family: 'StrokifyLight';
-  src: url('./fonts/StrokifyLight.woff2') format('woff2'),
-       url('./fonts/StrokifyLight.woff') format('woff');
+  src: url('./fonts/Strokify-LightDemo.woff2') format('woff2'),
+       url('./fonts/Strokify-LightDemo.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
