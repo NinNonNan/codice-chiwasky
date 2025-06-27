@@ -14,8 +14,22 @@ const container = document.getElementById("container"); // Contenitore principal
 let loading = false;            // Flag per evitare richieste multiple simultanee
 let hasMorePages = true;        // Indica se ci sono ancora pagine disponibili da caricare
 
-const PAGE_HEIGHT = 1122;       // Altezza fissa di una pagina (es. 29.7cm a 96dpi)
-const MAX_RECURSION_DEPTH = 10; // Profondità massima di ricorsione per evitare loop infiniti
+/**
+ * Misura l'altezza effettiva di un elemento .page appena creato,
+ * per farla coincidere con il CSS (height: calc(...)).
+ */
+function computePageHeight() {
+  const temp = document.createElement('div');
+  temp.className = 'page';
+  temp.style.visibility = 'hidden';
+  document.body.appendChild(temp);
+  const h = temp.clientHeight;  // altezza effettiva in px
+  document.body.removeChild(temp);
+  return h;
+}
+
+const PAGE_HEIGHT = computePageHeight(); // Altezza fissa della pagina A6-like
+const MAX_RECURSION_DEPTH = 10;          // Profondità massima di ricorsione per evitare loop infiniti
 
 /**
  * Crea un nuovo blocco pagina vuoto e lo restituisce.
@@ -23,7 +37,7 @@ const MAX_RECURSION_DEPTH = 10; // Profondità massima di ricorsione per evitare
 function createPage() {
   const page = document.createElement("div");
   page.classList.add("page");
-  page.style.marginBottom = "4rem"; // Spazio tra le pagine
+  // non serve più marginBottom qui, è gestito dal CSS
   return page;
 }
 
@@ -89,8 +103,6 @@ function tryAppendNode(node, page, depth = 0) {
         const chunkNode = document.createTextNode(chunks[i]);
         if (!tryAppendNode(chunkNode, page, depth + 1)) {
           // Se non entra, metto il resto del testo in una nuova pagina
-          // ricreo nodo con il testo rimanente
-          const remainingText = chunks.slice(i).join('');
           return false;
         }
       }
