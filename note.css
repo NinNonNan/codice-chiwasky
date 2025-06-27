@@ -11,11 +11,11 @@
 /* Stili base del body */
 body {
   margin: 0;
-  padding: 2rem;
+  padding: 1rem;              /* ridotto da 2rem */
   background: #f7f2e4 url('./images/paper-texture.jpg') repeat;
   font-family: 'HomemadeApple', cursive;
   color: #2e2b26;
-  line-height: 1.4;          /* leggermente ridotto da 1.6 */
+  line-height: 1.2;           /* molto stretto */
   display: flex;
   justify-content: center;
 }
@@ -25,7 +25,7 @@ body {
   width: 100%;
   max-width: 400px;
   height: calc(400px * 148 / 105);
-  padding: 2rem 2rem 1rem;
+  padding: 1.5rem 1.5rem 0.5rem;  /* padding ridotto */
   box-sizing: border-box;
   background-color: rgba(255,255,255,0.85);
   background-image:
@@ -35,42 +35,42 @@ body {
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
   border: 1px solid #ccc;
   position: relative;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;       /* meno spazio fra le pagine */
   overflow: hidden;
 }
 
-/* Titoli e paragrafi: margini verticali ridotti per aumentare densità testo */
+/* Titoli e paragrafi: margini quasi azzerati */
 h1 {
   font-size: 1.8rem;
-  margin-top: 0.2rem;
-  margin-bottom: 0.6rem;   /* ridotto da 1rem */
+  margin: 0 0 0.3rem 0;      /* niente margine sopra, piccolissimo sotto */
   text-align: center;
   text-decoration: underline;
+  line-height: 1.1;
 }
 
 p {
-  margin: 0.4rem 0;         /* ridotto da 0.8rem */
-  text-indent: 1.5rem;
+  margin: 0.2rem 0;          /* margine verticale quasi azzerato */
+  text-indent: 1.2rem;
   white-space: pre-line;
-  line-height: 1.4;         /* coerente con body */
+  line-height: 1.2;
 }
 
-/* Liste con margini verticali ridotti */
+/* Liste con margini e padding molto stretti */
 ul {
-  margin: 0.4rem 0 0.6rem 1.5rem;  /* margine superiore ridotto, inferiore leggermente più piccolo */
+  margin: 0.3rem 0 0.3rem 1.2rem;
   padding-left: 0;
 }
 
 li {
-  margin-bottom: 0.3rem;    /* ridotto da 0.4rem */
-  line-height: 1.3;
+  margin-bottom: 0.15rem;    /* margini tra voci ridottissimi */
+  line-height: 1.15;
 }
 
 /* Decorative smudge */
 .smudge {
   position: absolute;
-  bottom: 2rem;
-  left: 1.5rem;
+  bottom: 1.5rem;
+  left: 1rem;
   width: 60px;
   height: 30px;
   background: url('./images/ink-smudge.png') no-repeat center/contain;
