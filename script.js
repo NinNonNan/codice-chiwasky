@@ -1,24 +1,48 @@
-const PAGE_HEIGHT = 1122;  // Altezza pagina in px (esempio A4 a 96dpi)
-const container = document.getElementById("container");
-let currentPage = 1;
-let loading = false;
-let hasMorePages = true;
+/**
+ * Scroll infinito per un blocco di appunti generati da file Markdown.
+ * 
+ * Ogni file è nella cartella `notes/` ed è numerato: 1.md, 2.md, 3.md, ecc.
+ * Il contenuto di ciascun file viene convertito in HTML (usando la libreria `marked`)
+ * e inserito in un elemento <div class="page"> nel contenitore principale.
+ * 
+ * Quando l'utente scorre verso il fondo della pagina, viene automaticamente
+ * caricato e visualizzato il file Markdown successivo.
+ */
 
+let currentPage = 1;             // Numero della prossima pagina Markdown da caricare
+const container = document.getElementById("container"); // Contenitore principale delle pagine
+let loading = false;            // Flag per evitare richieste multiple simultanee
+let hasMorePages = true;        // Indica se ci sono ancora pagine disponibili da caricare
+
+const PAGE_HEIGHT = 1122;       // Altezza fissa di una pagina (es. 29.7cm a 96dpi)
+const MAX_RECURSION_DEPTH = 10; // Profondità massima di ricorsione per evitare loop infiniti
+
+/**
+ * Crea un nuovo blocco pagina vuoto e lo restituisce.
+ */
 function createPage() {
   const page = document.createElement("div");
   page.classList.add("page");
-  page.style.minHeight = PAGE_HEIGHT + "px";
-  page.style.marginBottom = "4rem";
-  page.style.boxSizing = "border-box";
-  page.style.position = "relative"; // per controllo dimensioni più preciso
+  page.style.marginBottom = "4rem"; // Spazio tra le pagine
   return page;
 }
 
-function splitTextToChunks(text, maxLength=100) {
-  // Spezza il testo in chunk più piccoli per evitare tagli bruschi
+/**
+ * Funzione helper per spezzare un testo in chunk di lunghezza massima fissa.
+ * Evita di spezzare in troppi segmenti troppo piccoli per prevenire ricorsione infinita.
+ * 
+ * @param {string} text Testo da spezzare
+ * @param {number} maxLength Lunghezza massima per chunk
+ * @returns {string[]} Array di chunk di testo
+ */
+function splitTextToChunks(text, maxLength = 100) {
+  if (text.length <= maxLength) {
+    // Troppo piccolo per spezzare, ritorno il testo intero
+    return [text];
+  }
   const chunks = [];
   let start = 0;
-  while(start < text.length) {
+  while (start < text.length) {
     let end = start + maxLength;
     if (end > text.length) end = text.length;
     chunks.push(text.slice(start, end));
@@ -28,100 +52,146 @@ function splitTextToChunks(text, maxLength=100) {
 }
 
 /**
- * Inserisce progressivamente nodi o frammenti nella pagina finché non si supera l'altezza.
- * Ritorna il nodo o frammento non inserito (da mettere nella pagina successiva), oppure null se tutto inserito.
+ * Funzione ricorsiva che prova ad aggiungere un nodo dentro una pagina.
+ * Se il nodo supera l'altezza massima, prova a spezzarlo in nodi più piccoli.
+ * Limita la profondità per evitare ricorsione infinita.
+ * 
+ * @param {Node} node Nodo da inserire
+ * @param {HTMLElement} page Pagina corrente
+ * @param {number} depth Profondità corrente di ricorsione
+ * @returns {boolean} True se il nodo è stato inserito completamente, False se serve nuova pagina
  */
-function appendWithPageBreak(node, page) {
+function tryAppendNode(node, page, depth = 0) {
+  if (depth > MAX_RECURSION_DEPTH) {
+    console.warn("Profondità ricorsione massima raggiunta, nodo non inserito:", node);
+    return false;
+  }
+
   page.appendChild(node);
+
   if (page.scrollHeight <= PAGE_HEIGHT) {
-    // Tutto ok
-    return null;
-  }
-  // Nodo troppo grande => togli e prova a spezzare
-  page.removeChild(node);
+    // Tutto ok, nodo inserito senza problemi
+    return true;
+  } else {
+    // Nodo troppo grande, rimuovo
+    page.removeChild(node);
 
-  if (node.nodeType === Node.TEXT_NODE) {
-    // Spezza testo in pezzi più piccoli
-    const chunks = splitTextToChunks(node.textContent, 50); // 50 caratteri per chunk
-    for(let i = 0; i < chunks.length; i++) {
-      const chunkNode = document.createTextNode(chunks[i]);
-      page.appendChild(chunkNode);
-      if (page.scrollHeight > PAGE_HEIGHT) {
-        page.removeChild(chunkNode);
-        // Ritorno il resto del testo non inserito
-        return document.createTextNode(chunks.slice(i).join(''));
+    if (node.nodeType === Node.TEXT_NODE) {
+      // Controlla se testo è troppo piccolo per spezzare
+      if (node.textContent.length <= 20) {
+        // Troppo piccolo per spezzare, non entra: serve nuova pagina
+        return false;
       }
-    }
-    return null; // tutto inserito
-  } else if (node.nodeType === Node.ELEMENT_NODE) {
-    // Provo a spezzare figli uno a uno
-    const clone = node.cloneNode(false);
-    page.appendChild(clone);
-    for(const child of node.childNodes) {
-      const leftover = appendWithPageBreak(child.cloneNode(true), clone);
-      if(leftover) {
-        page.removeChild(clone);
-        return clone; // Torno il nodo incompleto da mettere nella pagina dopo
+
+      // Spezza in chunk più piccoli
+      const chunks = splitTextToChunks(node.textContent, 50);
+      for (let i = 0; i < chunks.length; i++) {
+        const chunkNode = document.createTextNode(chunks[i]);
+        if (!tryAppendNode(chunkNode, page, depth + 1)) {
+          // Se non entra, metto il resto del testo in una nuova pagina
+          // ricreo nodo con il testo rimanente
+          const remainingText = chunks.slice(i).join('');
+          return false;
+        }
       }
-    }
-    return null; // tutto inserito
-  }
-  return node; // Non gestito, ritorno nodo intero
-}
+      return true;
 
-async function paginateContent(html) {
-  let fragment = document.createElement("div");
-  fragment.innerHTML = html;
-  let page = createPage();
-  container.appendChild(page);
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      // Nodo elemento con figli: prova a spezzare figli
+      const children = Array.from(node.childNodes);
+      const clone = node.cloneNode(false); // clone senza figli
+      page.appendChild(clone);
 
-  let nodes = Array.from(fragment.childNodes);
-  let i = 0;
-  while (i < nodes.length) {
-    let node = nodes[i].cloneNode(true);
-    let leftover = appendWithPageBreak(node, page);
-    if (leftover) {
-      // Non tutto inserito, creo pagina nuova per leftovers
-      page = createPage();
-      container.appendChild(page);
-      // Sostituisco nodo corrente con leftover per inserirlo nella pagina nuova
-      nodes[i] = leftover;
+      for (const child of children) {
+        if (!tryAppendNode(child.cloneNode(true), clone, depth + 1)) {
+          // Figlio non inserito => serve nuova pagina
+          page.removeChild(clone);
+          return false;
+        }
+      }
+      // Tutti i figli inseriti bene
+      return true;
+
     } else {
-      i++;
+      // Nodo di altro tipo non gestito, non inseribile
+      return false;
     }
   }
 }
 
+/**
+ * Suddivide l'HTML generato dal Markdown in più pagine
+ * in base all'altezza fissa predefinita.
+ */
+function paginateHTML(html) {
+  const temp = document.createElement("div");
+  temp.innerHTML = html;
+
+  let current = createPage();
+  container.appendChild(current);
+
+  for (const node of Array.from(temp.childNodes)) {
+    if (!tryAppendNode(node.cloneNode(true), current)) {
+      // Nodo non inserito => creo nuova pagina e riprovo
+      current = createPage();
+      container.appendChild(current);
+      const success = tryAppendNode(node.cloneNode(true), current);
+      if (!success) {
+        console.warn("Non è stato possibile inserire il nodo, anche spezzandolo", node);
+      }
+    }
+  }
+}
+
+/**
+ * Carica il prossimo file Markdown e lo converte in HTML.
+ * Aggiunge il contenuto al DOM, suddiviso in più blocchi di pagina se necessario.
+ */
 async function loadNextPage() {
-  if (loading || !hasMorePages) return;
+  if (loading || !hasMorePages) return false;
   loading = true;
 
   try {
-    const res = await fetch(`notes/${currentPage}.md`);
-    if (!res.ok) {
+    const response = await fetch(`notes/${currentPage}.md`);
+
+    if (!response.ok) {
       hasMorePages = false;
       loading = false;
-      return;
+      return false;
     }
-    const md = await res.text();
-    const html = marked.parse(md);
-    await paginateContent(html);
+
+    const markdown = await response.text();
+    const html = marked.parse(markdown);
+
+    paginateHTML(html);
+
     currentPage++;
+    loading = false;
+    return true;
+
   } catch (e) {
-    console.error(e);
+    console.error(`Errore durante il caricamento della pagina ${currentPage}:`, e);
     hasMorePages = false;
+    loading = false;
+    return false;
   }
-  loading = false;
 }
 
-// Carica pagine fino a rendere scrollabile la pagina
-async function preload() {
+/**
+ * Precarica pagine finché la pagina non è abbastanza lunga da poter scorrere.
+ * Utile al primo caricamento, se il contenuto iniziale è troppo corto.
+ */
+async function preloadUntilScrollable() {
   while (document.body.scrollHeight <= window.innerHeight && hasMorePages) {
-    await loadNextPage();
+    const success = await loadNextPage();
+    if (!success) break;
   }
 }
 
-window.addEventListener("DOMContentLoaded", preload);
+window.addEventListener("DOMContentLoaded", () => {
+  preloadUntilScrollable();
+});
+
 window.addEventListener("scroll", () => {
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
     loadNextPage();
