@@ -20,10 +20,11 @@ body {
 }
 
 #folio {
+  position: relative;
   background:
     linear-gradient(to right, #ccc 1px, transparent 1px),
     linear-gradient(to bottom, #ccc 1px, transparent 1px);
-  background-size: 30px 30px; /* quadretti più grandi */
+  background-size: 30px 30px;
   background-repeat: repeat;
   width: 600px;
   max-width: 90vw;
@@ -32,7 +33,29 @@ body {
   border-radius: 10px;
   line-height: 1.8;
   font-size: 1.3rem;
-  text-align: justify; /* giustifica il testo */
+  text-align: justify;
+  font-family: 'HomemadeApple', cursive, sans-serif;
+  color: #222;
+  overflow: hidden;
+}
+
+/* Overlay per effetto rumore */
+#folio::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none; /* non interferisce con il testo */
+  background-image:
+    radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 3px 3px;
+  opacity: 0.2;
+  filter: contrast(150%);
+  z-index: 1;
+  border-radius: 10px;
+}
+#folio > * {
+  position: relative;
+  z-index: 2;
 }
 
 h1, h2 {
