@@ -1,21 +1,71 @@
-# Diario Investigativo
+# Taccuino Investigativo
 
-## Giorno 1
+---
 
-Questa mattina ho esplorato i dintorni del campo base. Il terreno è fangoso e coperto da foglie umide, segno che qualcuno o qualcosa è passato di recente. Ho trovato una serie di orme che sembrano appartenere a una creatura bipede, ma con un'andatura irregolare. Potrebbe trattarsi di un ferito, o forse di qualcosa di peggio. Ho deciso di seguirle, anche se il tempo non è dalla mia parte.
+## Personaggi chiave
 
-La nebbia si fa sempre più fitta, e ogni albero sembra osservarmi. Continuo a scrivere per mantenere la lucidità, ma sento un costante sussurro alle mie spalle. Mi volto spesso, ma non vedo nulla. Non so se sto perdendo la ragione o se qualcosa mi segue davvero.
+### Sceriffo Harold Graves  
+- Età: 53 anni  
+- Figura influente, controlla la città più del sindaco.  
+- Il sindaco è praticamente inutile.
 
-## Giorno 2
+### Ester Blackwood  
+- Dottoressa della città.  
 
-La notte è stata lunga e senza riposo. Ho sentito dei suoni provenire dalla boscaglia. Alcuni sembravano passi, altri voci spezzate da un'eco lontana. Quando ho acceso la torcia, il fascio di luce ha colpito qualcosa tra gli alberi: due occhi, lucidi e fissi su di me, che sono spariti non appena mi sono mosso.
+---
 
-Stamattina ho trovato graffi profondi sul tronco di un faggio vicino alla mia tenda. Troppo profondi per un animale comune. Ho annotato ogni dettaglio nel caso dovessi andarmene in fretta e non tornare. Questo posto ha qualcosa di malato.
+## Popolazione  
+- Circa 15.000 abitanti, quasi tutti caucasici.  
+- Prevalenza di malattie di origine psichica.
 
-## Giorno 3
+---
 
-Il cielo è plumbeo e l'aria è satura di elettricità. I miei strumenti registrano picchi elettromagnetici ogni volta che mi avvicino alla radura al centro della foresta.
+## Luoghi Caldi
 
-Ho provato a entrare, ma ogni volta vengo sopraffatto da un senso di nausea. È come se qualcosa cercasse di respingermi. Ho piantato dei segnali per mappare l'area. Se dovessi sparire, forse qualcuno potrà seguire le mie tracce.
+- **Biblioteca della scuola** (anche biblioteca cittadina)  
+- **Chiesa Cristiana Evangelica**  
+- **Magazzino macchinari della centrale elettrica**
 
-Ho anche scoperto un simbolo inciso su una pietra. Non appartiene a nessuna lingua conosciuta, ma mi dà i brividi. L'ho disegnato sul retro del taccuino. Continuerò a studiarlo.
+Questi luoghi registrano casi di **amnesia collettiva** tra i locali.
+
+---
+
+## Fenomeni e ipotesi
+
+- **Amnesie collettive**: non causate da agenti chimici né da congegni russi.  
+- Interessano solo i locali, indicativamente “sangue antico”.  
+- Radio e ricetrasmittenti esplodono a causa di feedback ustionanti.  
+- Interferenze elettromagnetiche provenienti dalla centrale elettrica sembrano essere la causa delle amnesie.  
+- La centrale idroelettrica è in blackout, ma continua a mostrare attività radio anomala.
+
+---
+
+## Storia e dati
+
+- Il fenomeno è partito circa **60 anni fa**.  
+- Ha avuto una pausa di 20 anni senza registrazioni, poi è ripreso con aumento dal 1946.  
+- Il 48% degli esami del sangue sono risultati “sbagliati” o anomali.
+
+---
+
+## Possibili indizi e sospetti
+
+- Dal porto potrebbero arrivare materiali strani con **geroglifici o scrittura cuneiforme**.  
+- Luoghi da investigare ulteriormente:  
+  - Porto  
+  - Cava di Ardesia  
+  - Scuola radioamatori (incidente avvenuto l’anno scorso)  
+  - Bar dei minatori (dove c’è stata una rissa)
+
+---
+
+## Note operative
+
+- Tesserino FBI falso in circolazione.  
+- Veicoli sospetti non tracciabili.  
+- L’eco del rumore, del cervo e di Emmet sembrano collegati al fenomeno.  
+- Se si dovessero scoprire attività sovietiche, è fondamentale **avvisare subito**.
+
+---
+
+*Appunti personali: la situazione è molto più complessa di quanto sembri, il silenzio del sindaco è inquietante. La centralina elettrica potrebbe nascondere qualcosa di pericoloso.*  
