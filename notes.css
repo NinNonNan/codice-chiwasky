@@ -39,16 +39,16 @@ body {
   overflow: hidden;
 }
 
-/* Overlay per effetto rumore */
+/* Overlay per effetto rumore più delicato */
 #folio::before {
   content: "";
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   pointer-events: none;
-  background-image: radial-gradient(rgba(0,0,0,0.15) 1px, transparent 1px);
-  background-size: 4px 4px;
-  opacity: 0.5;
-  filter: contrast(300%);
+  background-image: radial-gradient(rgba(0,0,0,0.05) 1px, transparent 1px);
+  background-size: 5px 5px;
+  opacity: 0.15;
+  filter: contrast(150%);
   z-index: 1;
   border-radius: 10px;
 }
