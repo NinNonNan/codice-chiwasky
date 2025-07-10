@@ -1,7 +1,7 @@
 const SAFE_HEIGHT = 400 * 148 / 105;
 const container = document.getElementById('container');
 
-// Markdown di esempio ESTESO per test multipagina
+// Markdown ESTESO per test
 const markdownContent = `
 # Diario Investigativo
 
@@ -44,61 +44,60 @@ function createPage(pageNumber) {
   return page;
 }
 
-function getPageHeight(page) {
-  return page.getBoundingClientRect().height;
-}
-
-function splitTextBlock(tagName, original) {
-  const words = original.textContent.split(/\s+/);
-  const fragments = [];
-  let current = document.createElement(tagName);
+function splitTextBlock(tag, element) {
+  const words = element.textContent.split(/\s+/);
+  const parts = [];
+  let current = document.createElement(tag);
   current.textContent = '';
-  fragments.push(current);
+  container.appendChild(current);
 
-  for (const word of words) {
-    const test = current.cloneNode(true);
-    test.textContent += (test.textContent ? ' ' : '') + word;
-    container.appendChild(test);
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    current.textContent += (current.textContent ? ' ' : '') + word;
 
-    if (getPageHeight(container) > SAFE_HEIGHT) {
-      container.removeChild(test);
-      current = document.createElement(tagName);
-      current.textContent = word;
-      fragments.push(current);
-    } else {
-      current.textContent = test.textContent;
-      container.removeChild(test);
+    if (current.offsetHeight > SAFE_HEIGHT) {
+      // Remove last word
+      const text = current.textContent.split(' ');
+      const last = text.pop();
+      current.textContent = text.join(' ');
+
+      parts.push(current);
+      current = document.createElement(tag);
+      current.textContent = last;
+    }
+
+    if (i === words.length - 1) {
+      parts.push(current);
     }
   }
 
-  return fragments;
+  container.removeChild(current);
+  return parts;
 }
 
 function populatePages() {
-  let pageCount = 1;
-  let currentPage = createPage(pageCount);
+  let pageNumber = 1;
+  let currentPage = createPage(pageNumber);
 
-  for (const block of blocks) {
+  for (let block of blocks) {
     currentPage.appendChild(block);
 
-    if (getPageHeight(currentPage) > SAFE_HEIGHT) {
+    if (currentPage.offsetHeight > SAFE_HEIGHT) {
       currentPage.removeChild(block);
 
       const tag = block.tagName.toLowerCase();
       if (['p', 'li', 'h1', 'h2', 'h3'].includes(tag)) {
         const parts = splitTextBlock(tag, block);
-        for (const part of parts) {
+        for (let part of parts) {
           currentPage.appendChild(part);
-          if (getPageHeight(currentPage) > SAFE_HEIGHT) {
+          if (currentPage.offsetHeight > SAFE_HEIGHT) {
             currentPage.removeChild(part);
-            pageCount++;
-            currentPage = createPage(pageCount);
+            currentPage = createPage(++pageNumber);
             currentPage.appendChild(part);
           }
         }
       } else {
-        pageCount++;
-        currentPage = createPage(pageCount);
+        currentPage = createPage(++pageNumber);
         currentPage.appendChild(block);
       }
     }
