@@ -5,21 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Diario Investigativo</title>
   <link rel="stylesheet" href="notes.css" />
+
+  <!-- Includo marked.js da CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
   <script>
-    // Funzione semplice per caricare e convertire markdown in HTML base
     async function loadMarkdown() {
       const response = await fetch('content.md');
       const text = await response.text();
 
-      // Trasformazione molto basica di markdown a HTML (solo titoli e paragrafi)
-      const html = text
-        .split('\n')
-        .map(line => {
-          if(line.startsWith('# ')) return `<h1>${line.slice(2)}</h1>`;
-          if(line.startsWith('## ')) return `<h2>${line.slice(3)}</h2>`;
-          if(line.trim() === '') return '';
-          return `<p>${line}</p>`;
-        }).join('\n');
+      // Uso marked per convertire Markdown in HTML
+      const html = marked.parse(text);
 
       document.getElementById('folio').innerHTML = html;
     }
