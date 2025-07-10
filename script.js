@@ -56,7 +56,7 @@ function splitTextBlock(tag, element) {
     current.textContent += (current.textContent ? ' ' : '') + word;
 
     if (current.offsetHeight > SAFE_HEIGHT) {
-      // Remove last word
+      // Rimuovi l'ultima parola
       const text = current.textContent.split(' ');
       const last = text.pop();
       current.textContent = text.join(' ');
@@ -64,6 +64,7 @@ function splitTextBlock(tag, element) {
       parts.push(current);
       current = document.createElement(tag);
       current.textContent = last;
+      container.appendChild(current);
     }
 
     if (i === words.length - 1) {
@@ -80,13 +81,16 @@ function populatePages() {
   let currentPage = createPage(pageNumber);
 
   for (let block of blocks) {
-    currentPage.appendChild(block);
+    const tag = block.tagName.toLowerCase();
 
-    if (currentPage.offsetHeight > SAFE_HEIGHT) {
-      currentPage.removeChild(block);
+    if (['p', 'li', 'h1', 'h2', 'h3'].includes(tag)) {
+      // Misura altezza del blocco senza inserirlo
+      container.appendChild(block);
+      const blockHeight = block.offsetHeight;
+      container.removeChild(block);
 
-      const tag = block.tagName.toLowerCase();
-      if (['p', 'li', 'h1', 'h2', 'h3'].includes(tag)) {
+      if (currentPage.offsetHeight + blockHeight > SAFE_HEIGHT) {
+        // Se non entra, spezza subito
         const parts = splitTextBlock(tag, block);
         for (let part of parts) {
           currentPage.appendChild(part);
@@ -97,6 +101,13 @@ function populatePages() {
           }
         }
       } else {
+        currentPage.appendChild(block);
+      }
+    } else {
+      // Blocchi non testuali
+      currentPage.appendChild(block);
+      if (currentPage.offsetHeight > SAFE_HEIGHT) {
+        currentPage.removeChild(block);
         currentPage = createPage(++pageNumber);
         currentPage.appendChild(block);
       }
