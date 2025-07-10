@@ -26,8 +26,6 @@ body {
   padding: 40px 50px;
   box-shadow: 0 0 15px rgba(0,0,0,0.1);
   border-radius: 10px;
-  line-height: 2.1;
-  font-size: 1.4rem;
   text-align: justify;
   font-family: 'Sue Ellen Francisco', cursive;
   color: #222;
@@ -72,4 +70,5 @@ p {
   margin-top: 0;
   margin-bottom: 2em;
   line-height: 2.2;
+  font-size: 1.6rem;
 }
