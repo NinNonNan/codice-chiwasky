@@ -23,15 +23,15 @@ body {
   background:
     linear-gradient(to right, #ccc 1px, transparent 1px),
     linear-gradient(to bottom, #ccc 1px, transparent 1px);
-  background-size: 20px 20px;
+  background-size: 30px 30px; /* quadretti più grandi */
   background-repeat: repeat;
   width: 600px;
   max-width: 90vw;
   padding: 40px 50px;
   box-shadow: 0 0 15px rgba(0,0,0,0.1);
   border-radius: 10px;
-  line-height: 1.8; /* aumentata da 1.5 a 1.8 */
-  font-size: 1.3rem; /* aggiunto, per ingrandire il testo */
+  line-height: 1.8;
+  font-size: 1.3rem;
 }
 
 h1, h2 {
