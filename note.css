@@ -1,104 +1,52 @@
-/* Definizione font personalizzato */
 @font-face {
   font-family: 'HomemadeApple';
-  src: url('./fonts/HomemadeApple.woff2') format('woff2'),
-       url('./fonts/HomemadeApple.woff') format('woff');
+  src: url('fonts/HomemadeApple.woff') format('woff');
   font-weight: normal;
   font-style: normal;
-  font-display: swap;
 }
 
-/* Stili base del body */
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  padding: 1rem;              /* padding contenuto generale */
-  background: #f7f2e4 url('./images/paper-texture.jpg') repeat;
-  font-family: 'HomemadeApple', cursive;
-  color: #2e2b26;
-  line-height: 1.2;
+  padding: 40px 20px;
+  background: #f0f0f0;
   display: flex;
   justify-content: center;
+  font-family: 'HomemadeApple', cursive, sans-serif;
+  color: #222;
 }
 
-/* Foglio tascabile A6 con dimensioni proporzionate */
-.page {
-  width: 100%;
-  max-width: 400px;
-  height: calc(400px * 148 / 105); /* proporzione A6 */
-  padding: 1.5rem 1.5rem 0.5rem;   /* top, right/left, bottom */
-  box-sizing: border-box;
-  background-color: rgba(255,255,255,0.85);
-  background-image:
-    linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+#folio {
+  background:
+    linear-gradient(to right, #ccc 1px, transparent 1px),
+    linear-gradient(to bottom, #ccc 1px, transparent 1px);
   background-size: 20px 20px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  border: 1px solid #ccc;
-  position: relative;
-  margin-bottom: 1rem;
-  overflow: hidden; /* nasconde overflow per evitare scroll interno */
+  background-repeat: repeat;
+  width: 600px;
+  max-width: 90vw;
+  padding: 40px 50px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  line-height: 1.5;
 }
 
-/* Evita che singoli blocchi si spezzino a metà pagina */
-.page > * {
-  break-inside: avoid;
-  page-break-inside: avoid;
-  -webkit-column-break-inside: avoid;
+h1, h2 {
+  margin-top: 0;
 }
 
-/* Titoli e paragrafi: margini ridotti per compattezza */
 h1 {
-  font-size: 1.8rem;
-  margin: 0 0 0.3rem 0;
-  text-align: center;
-  text-decoration: underline;
-  line-height: 1.1;
+  margin-bottom: 0.5em;
+}
+
+h2 {
+  margin-top: 2em;
+  margin-bottom: 0.5em;
 }
 
 p {
-  margin: 0.15rem 0;
-  text-indent: 1.2rem;
-  white-space: pre-line;
-  line-height: 1.2;
-}
-
-/* Liste con margini e padding stretti */
-ul {
-  margin: 0.25rem 0 0.25rem 1.2rem;
-  padding-left: 0;
-}
-
-li {
-  margin-bottom: 0.12rem;
-  line-height: 1.15;
-}
-
-/* Riduzione ulteriore spazi fra blocchi adiacenti */
-h1 + p,
-h1 + ul,
-p + p,
-p + ul,
-ul + p,
-ul + ul {
-  margin-top: 0.2rem;
-}
-
-/* Immagini in pagina (se ci sono) */
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0.5rem auto;
-}
-
-/* Aggiunte eventuali regole per segnalare pagina */
-.page::after {
-  content: attr(data-page);
-  position: absolute;
-  bottom: 0.2rem;
-  right: 0.5rem;
-  font-size: 0.75rem;
-  color: #aaa;
-  user-select: none;
-  pointer-events: none;
+  margin-top: 0;
+  margin-bottom: 1.2em;
 }
