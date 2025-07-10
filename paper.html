@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Diario Investigativo - Pagination Fine</title>
+<title>Diario Investigativo - Formato A5</title>
 <style>
   @font-face {
     font-family: 'Homemade Apple';
@@ -15,34 +15,31 @@
 
   body {
     font-family: 'Homemade Apple', cursive, sans-serif;
-    margin: 20px;
     background: #f0f0f0;
+    margin: 30px 0;
+    display: flex;
+    justify-content: center;
   }
 
   #container {
-    width: 500px;
-    margin: auto;
+    width: 560px; /* A5 width approx */
   }
 
   .page {
     box-sizing: border-box;
-    width: 100%;
-    min-height: 400px;
-    max-height: 400px;
-    overflow: hidden;
+    width: 560px;
+    height: 794px; /* A5 height approx */
     background: white;
-    margin-bottom: 20px;
-    padding: 20px;
+    margin-bottom: 30px;
+    padding: 40px 30px;
     border: 1px solid #ccc;
-    page-break-after: always;
-
-    /* Form factor taccuino: proporzioni un po' strette e alte */
     border-radius: 8px;
+    overflow: hidden;
 
-    /* Quadretti: griglia a quadri leggera */
+    /* Quadretti molto leggeri */
     background-image:
-      linear-gradient(to right, #c0c0c0 1px, transparent 1px),
-      linear-gradient(to bottom, #c0c0c0 1px, transparent 1px);
+      linear-gradient(to right, #ddd 1px, transparent 1px),
+      linear-gradient(to bottom, #ddd 1px, transparent 1px);
     background-size: 20px 20px;
   }
 
@@ -50,10 +47,23 @@
     content: attr(data-page);
     display: block;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     font-size: 1.1em;
     color: #444;
   }
+
+  /* Per i titoli e paragrafi */
+  h1, h2 {
+    margin-top: 0;
+    margin-bottom: 1em;
+  }
+
+  p {
+    margin-top: 0;
+    margin-bottom: 1em;
+    line-height: 1.5;
+  }
+
 </style>
 </head>
 <body>
@@ -62,7 +72,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
-  const SAFE_HEIGHT = 400;
+  const SAFE_HEIGHT = 794 - 40 * 2 - 30; // altezza pagina - padding verticali - margine bottom (circa)
   const container = document.getElementById('container');
 
   const markdownContent = `
