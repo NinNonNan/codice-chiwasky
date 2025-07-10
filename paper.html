@@ -3,67 +3,37 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Diario Investigativo - Formato A5</title>
+<title>Diario Investigativo - Pagination Fine</title>
 <style>
-  @font-face {
-    font-family: 'Homemade Apple';
-    src: url('/fonts/HomemadeApple.woff2') format('woff2'),
-         url('/fonts/HomemadeApple.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-  }
-
   body {
-    font-family: 'Homemade Apple', cursive, sans-serif;
+    font-family: Arial, sans-serif; /* Cambia qui con il font che vuoi */
+    margin: 20px;
     background: #f0f0f0;
-    margin: 30px 0;
-    display: flex;
-    justify-content: center;
   }
-
   #container {
-    width: 560px; /* A5 width approx */
+    width: 560px; /* Form factor A5 circa in px */
+    margin: auto;
   }
-
   .page {
     box-sizing: border-box;
-    width: 560px;
-    height: 794px; /* A5 height approx */
-    background: white;
-    margin-bottom: 30px;
-    padding: 40px 30px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    width: 100%;
+    min-height: 790px; /* Altezza A5 */
+    max-height: 790px;
     overflow: hidden;
-
-    /* Quadretti molto leggeri */
-    background-image:
-      linear-gradient(to right, #ddd 1px, transparent 1px),
-      linear-gradient(to bottom, #ddd 1px, transparent 1px);
-    background-size: 20px 20px;
+    background: white;
+    margin-bottom: 20px;
+    padding: 30px;
+    border: 1px solid #ccc;
+    page-break-after: always;
   }
-
   .page[data-page]::before {
     content: attr(data-page);
     display: block;
     font-weight: bold;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     font-size: 1.1em;
     color: #444;
   }
-
-  /* Per i titoli e paragrafi */
-  h1, h2 {
-    margin-top: 0;
-    margin-bottom: 1em;
-  }
-
-  p {
-    margin-top: 0;
-    margin-bottom: 1em;
-    line-height: 1.5;
-  }
-
 </style>
 </head>
 <body>
@@ -72,9 +42,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
-  const SAFE_HEIGHT = 794 - 40 * 2 - 30; // altezza pagina - padding verticali - margine bottom (circa)
+  // --- Parametri ---
+  const SAFE_HEIGHT = 790; // Altezza max pagina in px (deve corrispondere a CSS .page min/max-height)
   const container = document.getElementById('container');
 
+  // --- Contenuto (puoi sostituirlo col tuo testo markdown) ---
   const markdownContent = `
 # Diario Investigativo
 
@@ -109,6 +81,9 @@ La radura mi chiama. Ho sognato il simbolo. Era vivo, si muoveva, e mi parlava. 
 Se questa è la mia ultima nota, allora che serva da avvertimento. Non seguite le orme che ho lasciato. Alcuni segreti devono rimanere sepolti.
 `;
 
+  // --- Funzioni utili ---
+
+  // Funzione per dividere un testo lungo in frasi più piccole
   function splitIntoSentences(text) {
     text = text.trim();
     const regex = /[^.!?;]+[.!?;]?/g;
@@ -117,11 +92,17 @@ Se questa è la mia ultima nota, allora che serva da avvertimento. Non seguite l
     return matches.map(s => s.trim()).filter(s => s.length > 0);
   }
 
+  // Converte markdown in HTML con marked
   const htmlContent = marked.parse(markdownContent);
+
+  // Wrapper temporaneo per manipolare elementi HTML
   const tempWrapper = document.createElement('div');
   tempWrapper.innerHTML = htmlContent;
+
+  // Estraggo i blocchi di primo livello (h1, h2, p, etc)
   const blocks = Array.from(tempWrapper.children);
 
+  // Crea pagina nuova
   function createPage(pageNumber) {
     const page = document.createElement('div');
     page.className = 'page';
@@ -130,6 +111,7 @@ Se questa è la mia ultima nota, allora che serva da avvertimento. Non seguite l
     return page;
   }
 
+  // Verifica se l'elemento entra nella pagina
   function canFit(element, container) {
     container.appendChild(element);
     const fits = container.scrollHeight <= SAFE_HEIGHT;
@@ -137,6 +119,7 @@ Se questa è la mia ultima nota, allora che serva da avvertimento. Non seguite l
     return fits;
   }
 
+  // Aggiunge testo spezzato in frasi nella pagina
   function addTextWithSplit(text, currentPage, pageNumber) {
     const sentences = splitIntoSentences(text);
     let tempParagraph = document.createElement('p');
@@ -145,6 +128,7 @@ Se questa è la mia ultima nota, allora che serva da avvertimento. Non seguite l
       tempParagraph.textContent += (tempParagraph.textContent ? ' ' : '') + sentence;
 
       if (!canFit(tempParagraph, currentPage)) {
+        // tolgo l'ultima frase
         tempParagraph.textContent = tempParagraph.textContent.slice(0, -sentence.length).trim();
         if (tempParagraph.textContent.length > 0) {
           currentPage.appendChild(tempParagraph);
@@ -161,6 +145,7 @@ Se questa è la mia ultima nota, allora che serva da avvertimento. Non seguite l
     return { currentPage, pageNumber };
   }
 
+  // Popola pagine con i blocchi
   function populatePages() {
     let pageNumber = 1;
     let currentPage = createPage(pageNumber);
@@ -180,8 +165,10 @@ Se questa è la mia ultima nota, allora che serva da avvertimento. Non seguite l
     }
   }
 
+  // Avvio
   container.innerHTML = '';
   populatePages();
+
 </script>
 
 </body>
