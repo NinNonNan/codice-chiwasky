@@ -30,7 +30,8 @@ body {
   padding: 40px 50px;
   box-shadow: 0 0 15px rgba(0,0,0,0.1);
   border-radius: 10px;
-  line-height: 1.5;
+  line-height: 1.8; /* aumentata da 1.5 a 1.8 */
+  font-size: 1.3rem; /* aggiunto, per ingrandire il testo */
 }
 
 h1, h2 {
@@ -48,5 +49,5 @@ h2 {
 
 p {
   margin-top: 0;
-  margin-bottom: 1.2em;
+  margin-bottom: 1.8em; /* aumentata da 1.2em a 1.8em per più spazio */
 }
