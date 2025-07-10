@@ -5,15 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Diario Investigativo - Pagination Fine</title>
 <style>
+  @font-face {
+    font-family: 'Homemade Apple';
+    src: url('/fonts/HomemadeApple.woff2') format('woff2'),
+         url('/fonts/HomemadeApple.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
+
   body {
-    font-family: Arial, sans-serif;
+    font-family: 'Homemade Apple', cursive, sans-serif;
     margin: 20px;
     background: #f0f0f0;
   }
+
   #container {
     width: 500px;
     margin: auto;
   }
+
   .page {
     box-sizing: border-box;
     width: 100%;
@@ -25,7 +35,17 @@
     padding: 20px;
     border: 1px solid #ccc;
     page-break-after: always;
+
+    /* Form factor taccuino: proporzioni un po' strette e alte */
+    border-radius: 8px;
+
+    /* Quadretti: griglia a quadri leggera */
+    background-image:
+      linear-gradient(to right, #c0c0c0 1px, transparent 1px),
+      linear-gradient(to bottom, #c0c0c0 1px, transparent 1px);
+    background-size: 20px 20px;
   }
+
   .page[data-page]::before {
     content: attr(data-page);
     display: block;
@@ -42,11 +62,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
-  // --- Parametri ---
-  const SAFE_HEIGHT = 400; // Altezza massima pagina in px (uguale a CSS .page min/max height)
+  const SAFE_HEIGHT = 400;
   const container = document.getElementById('container');
 
-  // --- Contenuto (puoi sostituirlo col tuo testo markdown) ---
   const markdownContent = `
 # Diario Investigativo
 
@@ -81,33 +99,19 @@ La radura mi chiama. Ho sognato il simbolo. Era vivo, si muoveva, e mi parlava. 
 Se questa è la mia ultima nota, allora che serva da avvertimento. Non seguite le orme che ho lasciato. Alcuni segreti devono rimanere sepolti.
 `;
 
-  // --- Funzioni utili ---
-
-  // Funzione per dividere un testo lungo in frasi più piccole
-  // Usa regex per trovare punti interrogativi, esclamativi, punti e virgola, punti.
   function splitIntoSentences(text) {
-    // Rimuove eventuali spazi iniziali/finali
     text = text.trim();
-    // Divide in base a . ? ! ; seguiti da spazio o fine stringa, mantenendo il segno
-    // Conserva i segni di punteggiatura alla fine di ogni frase
     const regex = /[^.!?;]+[.!?;]?/g;
     const matches = text.match(regex);
     if (!matches) return [text];
-    // Filtro eventuali stringhe vuote
     return matches.map(s => s.trim()).filter(s => s.length > 0);
   }
 
-  // Converte markdown in HTML con marked (caricato da CDN)
   const htmlContent = marked.parse(markdownContent);
-
-  // Wrapper temporaneo per manipolare elementi HTML
   const tempWrapper = document.createElement('div');
   tempWrapper.innerHTML = htmlContent;
-
-  // Estraggo i blocchi di primo livello (h1, h2, p, etc)
   const blocks = Array.from(tempWrapper.children);
 
-  // Funzione per creare una pagina vuota nel container
   function createPage(pageNumber) {
     const page = document.createElement('div');
     page.className = 'page';
@@ -116,8 +120,6 @@ Se questa è la mia ultima nota, allora che serva da avvertimento. Non seguite l
     return page;
   }
 
-  // Funzione che controlla se un elemento entra in una pagina
-  // Inserisce temporaneamente, misura, rimuove
   function canFit(element, container) {
     container.appendChild(element);
     const fits = container.scrollHeight <= SAFE_HEIGHT;
@@ -125,30 +127,23 @@ Se questa è la mia ultima nota, allora che serva da avvertimento. Non seguite l
     return fits;
   }
 
-  // Funzione per aggiungere un testo (frasi) spezzato per pagine
   function addTextWithSplit(text, currentPage, pageNumber) {
     const sentences = splitIntoSentences(text);
     let tempParagraph = document.createElement('p');
     for (let i = 0; i < sentences.length; i++) {
       const sentence = sentences[i];
-      // Aggiungo la frase al paragrafo temporaneo
       tempParagraph.textContent += (tempParagraph.textContent ? ' ' : '') + sentence;
 
       if (!canFit(tempParagraph, currentPage)) {
-        // Se non entra, togliamo l'ultima frase
         tempParagraph.textContent = tempParagraph.textContent.slice(0, -sentence.length).trim();
-        // Se c'è testo nel paragrafo, lo aggiungiamo alla pagina
         if (tempParagraph.textContent.length > 0) {
           currentPage.appendChild(tempParagraph);
         }
-        // Creo nuova pagina
         currentPage = createPage(++pageNumber);
-        // Creo un nuovo paragrafo e aggiungo la frase che non è entrata
         tempParagraph = document.createElement('p');
         tempParagraph.textContent = sentence;
       }
 
-      // Se siamo all'ultima frase, aggiungiamo il paragrafo
       if (i === sentences.length - 1 && tempParagraph.textContent.length > 0) {
         currentPage.appendChild(tempParagraph);
       }
@@ -156,26 +151,18 @@ Se questa è la mia ultima nota, allora che serva da avvertimento. Non seguite l
     return { currentPage, pageNumber };
   }
 
-  // Funzione principale che popola le pagine con i blocchi
   function populatePages() {
     let pageNumber = 1;
     let currentPage = createPage(pageNumber);
 
     for (let block of blocks) {
-      // Gestione differenziata per tag:
       if (block.tagName === 'P') {
-        // Per paragrafi lunghi, spezzare in frasi più piccole
         const { currentPage: newPage, pageNumber: newPageNumber } = addTextWithSplit(block.textContent, currentPage, pageNumber);
         currentPage = newPage;
         pageNumber = newPageNumber;
-
       } else {
-        // Per titoli (h1, h2, h3...) e altri blocchi: li trattiamo come singoli elementi
-
         let clone = block.cloneNode(true);
-
         if (!canFit(clone, currentPage)) {
-          // Nuova pagina se non entra
           currentPage = createPage(++pageNumber);
         }
         currentPage.appendChild(clone);
@@ -183,10 +170,8 @@ Se questa è la mia ultima nota, allora che serva da avvertimento. Non seguite l
     }
   }
 
-  // Puliamo contenitore e avviamo
   container.innerHTML = '';
   populatePages();
-
 </script>
 
 </body>
