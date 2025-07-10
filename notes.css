@@ -1,9 +1,4 @@
-@font-face {
-  font-family: 'HomemadeApple';
-  src: url('fonts/HomemadeApple.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
+@import url('https://fonts.googleapis.com/css2?family=Mr+Dafoe&display=swap');
 
 * {
   box-sizing: border-box;
@@ -15,7 +10,7 @@ body {
   background: #f0f0f0;
   display: flex;
   justify-content: center;
-  font-family: 'HomemadeApple', cursive, sans-serif;
+  font-family: 'Mr Dafoe', cursive;
   color: #222;
 }
 
@@ -34,7 +29,7 @@ body {
   line-height: 1.8;
   font-size: 1.3rem;
   text-align: justify;
-  font-family: 'HomemadeApple', cursive, sans-serif;
+  font-family: 'Mr Dafoe', cursive;
   color: #222;
   overflow: hidden;
 }
